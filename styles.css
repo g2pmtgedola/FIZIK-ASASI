@@ -1,0 +1,292 @@
+/* Custom Styling for FizikAsasi UiTM Platform */
+
+@layer utilities {
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  overflow-x: hidden;
+}
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Tab active and hover states */
+.chapter-tab {
+  display: block;
+}
+.chapter-tab.hidden {
+  display: none !important;
+}
+
+.nav-btn {
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.nav-btn.active {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.35), rgba(30, 58, 138, 0.5)) !important;
+  color: #ffffff !important;
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 0 15px rgba(2, 132, 199, 0.3) !important;
+  font-weight: 700 !important;
+}
+
+.nav-btn[data-tab="cheatsheet"].active {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.35), rgba(180, 83, 9, 0.5)) !important;
+  color: #fef08a !important;
+  border-color: rgba(245, 158, 11, 0.6) !important;
+  box-shadow: 0 0 15px rgba(217, 119, 6, 0.3) !important;
+}
+
+.nav-btn:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+}
+
+/* Bottom mobile dock active states */
+.dock-btn.active {
+  color: #38bdf8 !important;
+  background-color: rgba(56, 189, 248, 0.2) !important;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  font-weight: 700;
+}
+
+/* Glassmorphic Cards */
+.glass-panel {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ==========================================
+   KATEX MATH OVERFLOW & OVERLAP PROTECTION
+   ========================================== */
+.katex {
+  font-size: 0.98em;
+  max-width: 100%;
+}
+
+.katex-display {
+  margin: 0.4em 0 !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  max-width: 100% !important;
+  padding: 4px 0 !important;
+  scrollbar-width: thin;
+}
+
+.katex-html {
+  max-width: 100%;
+}
+
+/* Ensure all formula boxes handle overflow cleanly */
+.font-mono, pre, code {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Custom range sliders */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #38bdf8;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+  transition: transform 0.1s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* Quiz Option styling */
+.quiz-option {
+  transition: all 0.2s ease-in-out;
+}
+
+.quiz-option:hover {
+  border-color: #38bdf8;
+  background-color: rgba(56, 189, 248, 0.08);
+}
+
+.quiz-option.correct {
+  border-color: #34d399 !important;
+  background-color: rgba(52, 211, 153, 0.15) !important;
+  color: #a7f3d0 !important;
+}
+
+.quiz-option.wrong {
+  border-color: #f87171 !important;
+  background-color: rgba(248, 113, 113, 0.15) !important;
+  color: #fecaca !important;
+}
+
+/* ==========================================
+   DEVICE SIMULATOR MODES (WINDOWS vs PHONE/TABLET)
+   ========================================== */
+
+/* Outer wrapper when in device frame mode */
+.device-mode-active {
+  background: radial-gradient(circle at center, #1e293b 0%, #090d16 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0 40px 0;
+}
+
+/* Phone Mockup Frame (iPhone 15 Pro / Galaxy style) */
+.device-frame-phone {
+  max-width: 410px !important;
+  width: 100% !important;
+  margin: 10px auto !important;
+  border: 12px solid #1e293b;
+  border-radius: 46px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  background: #0f172a;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Tablet Mockup Frame (iPad style) */
+.device-frame-tablet {
+  max-width: 780px !important;
+  width: 100% !important;
+  margin: 10px auto !important;
+  border: 14px solid #1e293b;
+  border-radius: 36px;
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  background: #0f172a;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Force Single Column Stack inside Phone Frame to prevent any overlap */
+.device-frame-phone .grid-cols-1,
+.device-frame-phone .grid-cols-2,
+.device-frame-phone .grid-cols-3,
+.device-frame-phone .grid-cols-4,
+.device-frame-phone [class*="md:grid-cols-"],
+.device-frame-phone [class*="lg:grid-cols-"],
+.device-frame-phone [class*="sm:grid-cols-"] {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+/* Allow compact 2-columns for small stat badges inside phone */
+.device-frame-phone .grid-cols-2.gap-2,
+.device-frame-phone .grid-cols-2.text-xs {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* Force flex column on desktop side-by-side elements inside Phone Frame */
+.device-frame-phone [class*="md:flex-row"],
+.device-frame-phone [class*="lg:flex-row"] {
+  flex-direction: column !important;
+}
+
+/* Hide desktop navbar elements and show mobile elements inside phone frame */
+.device-frame-phone header .hidden.lg\\:flex {
+  display: none !important;
+}
+.device-frame-phone header .lg\\:hidden {
+  display: flex !important;
+}
+
+/* Padding and text size tuning for phone frame */
+.device-frame-phone main {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+.device-frame-phone .text-2xl,
+.device-frame-phone .text-3xl {
+  font-size: 1.25rem !important;
+  line-height: 1.4 !important;
+}
+.device-frame-phone .p-6 {
+  padding: 1rem !important;
+}
+
+/* Tablet frame column tuning */
+.device-frame-tablet [class*="lg:grid-cols-3"],
+.device-frame-tablet [class*="md:grid-cols-3"] {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+.device-frame-tablet [class*="md:grid-cols-2"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* Simulated Phone Notch / Dynamic Island */
+.device-notch {
+  width: 110px;
+  height: 24px;
+  background-color: #000;
+  border-radius: 20px;
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+}
+
+/* Simulated Mobile Status Bar */
+.device-statusbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 18px 2px 18px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #e2e8f0;
+  background: #090d16;
+  position: relative;
+  z-index: 55;
+}
+
+/* Simulated Bottom Home Indicator */
+.device-home-bar {
+  width: 120px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 10px;
+  margin: 8px auto 4px auto;
+}
+
+/* Print view optimization */
+@media print {
+  header, footer, .nav-btn, #calculator-modal, button, #view-switcher-bar, #mobile-bottom-dock {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .chapter-tab {
+    display: block !important;
+  }
+  .bg-slate-800\/80, .bg-slate-900, .bg-slate-950 {
+    background: white !important;
+    color: black !important;
+    border: 1px solid #ccc !important;
+  }
+  .text-white, .text-slate-300, .text-slate-400 {
+    color: #111 !important;
+  }
+  .text-sky-400, .text-teal-400, .text-amber-400, .text-purple-400 {
+    color: #000 !important;
+    font-weight: bold;
+  }
+}

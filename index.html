@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="ms" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FizikAsasi UiTM — Platform Pembelajaran Interaktif Amal</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              800: '#0c4a6e',
+              900: '#082f49',
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- KaTeX for crisp LaTeX Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-sky-500 selection:text-white">
+
+  <!-- TOP VIEW MODE SWITCHER BAR (Dual-View: Windows vs Phone/Tablet) -->
+  <div id="view-switcher-bar" class="sticky top-0 z-[100] bg-slate-900/95 backdrop-blur-md border-b border-sky-500/20 px-4 py-2 flex items-center justify-between shadow-md">
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-bold text-sky-400 flex items-center gap-1.5">
+        <i data-lucide="layout" class="w-4 h-4"></i> Mod Paparan:
+      </span>
+      <div class="inline-flex rounded-lg bg-slate-800 p-0.5 border border-slate-700">
+        <button onclick="setViewMode('windows')" id="btn-view-windows" class="view-btn px-3 py-1 rounded-md text-xs font-medium text-white bg-sky-500 flex items-center gap-1.5 transition shadow">
+          <i data-lucide="monitor" class="w-3.5 h-3.5"></i> Windows (Desktop)
+        </button>
+        <button onclick="setViewMode('tablet')" id="btn-view-tablet" class="view-btn px-3 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 transition">
+          <i data-lucide="tablet" class="w-3.5 h-3.5"></i> Tablet (iPad)
+        </button>
+        <button onclick="setViewMode('phone')" id="btn-view-phone" class="view-btn px-3 py-1 rounded-md text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5 transition">
+          <i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Phone (Mobil)
+        </button>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <span class="hidden sm:inline-block text-[11px] text-slate-400">
+        🎓 100% Mengikut Slide Asasi Fizik UiTM Dengkil
+      </span>
+      <button onclick="toggleOrientation()" id="btn-orientation" class="hidden px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 flex items-center gap-1">
+        <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> Putar Skrin
+      </button>
+    </div>
+  </div>
+
+  <!-- DEVICE CONTAINER WRAPPER -->
+  <div id="device-wrapper" class="w-full flex-1 flex flex-col items-center justify-start transition-all duration-300">
+    <div id="app-viewport" class="w-full max-w-7xl flex flex-col min-h-screen bg-slate-900 shadow-2xl relative transition-all duration-300">
+
+      <!-- Simulated Mobile Status Bar -->
+      <div id="device-statusbar" class="device-statusbar hidden">
+        <span id="device-clock">13:45</span>
+        <div class="device-notch" id="device-notch"></div>
+        <div class="flex items-center gap-2">
+          <span>5G</span>
+          <span>100% 🔋</span>
+        </div>
+      </div>
+
+      <!-- TOP NAVIGATION -->
+      <header class="sticky top-0 z-40 backdrop-blur-md bg-slate-900/90 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('ch7')">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20 text-white font-bold text-xl">
+              ⚛️
+            </div>
+            <div>
+              <span class="font-bold text-lg text-white tracking-tight flex items-center gap-1.5">
+                FizikAsasi <span class="text-xs px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-400 font-medium border border-sky-500/30">UiTM Dengkil</span>
+              </span>
+              <p class="text-xs text-slate-400">Khas untuk Amal — Nota Paling Mudah, Visual &amp; Latihan Lengkap</p>
+            </div>
+          </div>
+
+          <!-- Desktop Navigation Tabs -->
+          <div class="hidden lg:flex items-center space-x-1.5">
+            <button onclick="switchTab('ch7')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all active" data-tab="ch7">
+              🪐 Bab 7: Rotational Motion
+            </button>
+            <button onclick="switchTab('ch9')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all" data-tab="ch9">
+              🌊 Bab 9: Solids &amp; Fluids
+            </button>
+            <button onclick="switchTab('ch11')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all" data-tab="ch11">
+              🔥 Bab 11: Thermal Processes
+            </button>
+            <button onclick="switchTab('ch13')" class="nav-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all" data-tab="ch13">
+              〰️ Bab 13: Waves &amp; SHM
+            </button>
+            <button onclick="switchTab('cheatsheet')" class="nav-btn px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30" data-tab="cheatsheet">
+              📑 Formula Poket
+            </button>
+          </div>
+
+          <div class="flex items-center space-x-2.5">
+            <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/60 text-xs">
+              <span class="text-slate-400">Skor Kuiz:</span>
+              <span id="total-score-badge" class="font-bold text-emerald-400 text-sm">0 / 0</span>
+            </div>
+            <button onclick="openFormulaModal()" class="p-2 rounded-lg bg-sky-500/10 text-sky-400 border border-sky-500/30 hover:bg-sky-500/20 text-xs flex items-center gap-1">
+              <i data-lucide="calculator" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Kalkulator</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Horizontal Scrollable Nav for Mobile / Tablet -->
+        <div class="lg:hidden flex overflow-x-auto px-4 py-2 space-x-2 border-t border-slate-800 bg-slate-950/80 text-xs scrollbar-none">
+          <button onclick="switchTab('ch7')" class="nav-btn whitespace-nowrap px-3 py-1 rounded-md active" data-tab="ch7">Bab 7: Putaran</button>
+          <button onclick="switchTab('ch9')" class="nav-btn whitespace-nowrap px-3 py-1 rounded-md" data-tab="ch9">Bab 9: Pepejal &amp; Bendalir</button>
+          <button onclick="switchTab('ch11')" class="nav-btn whitespace-nowrap px-3 py-1 rounded-md" data-tab="ch11">Bab 11: Terma</button>
+          <button onclick="switchTab('ch13')" class="nav-btn whitespace-nowrap px-3 py-1 rounded-md" data-tab="ch13">Bab 13: Gelombang</button>
+          <button onclick="switchTab('cheatsheet')" class="nav-btn whitespace-nowrap px-3 py-1 rounded-md text-amber-400 font-bold bg-amber-500/10 border border-amber-500/30" data-tab="cheatsheet">📑 Formula Poket</button>
+        </div>
+      </header>
+
+      <!-- HERO BANNER -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-sky-950/40 via-slate-900 to-slate-900 py-5 border-b border-slate-800/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold mb-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                Semua Nota &amp; Contoh Soalan Slide Kuliah UiTM Dimasukkan
+              </div>
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                Hai Amal! Jom Kuasai Fizik Asasi Sains UiTM 🚀
+              </h1>
+              <p class="text-slate-300 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
+                Platform ini mengandungi <strong class="text-sky-300">semua 4 Bab Kuliah Exam</strong> (Bab 7, 9, 11, 13) lengkap dengan <strong class="text-emerald-300">penerangan konsep paling mudah</strong>, <strong class="text-teal-300">makmal simulasi 60 FPS</strong>, <strong class="text-amber-300">jalan kerja langkah demi langkah setiap contoh &amp; latihan</strong>, dan <strong class="text-purple-300">kuiz semak pantas</strong>.
+              </p>
+            </div>
+
+            <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3 backdrop-blur-sm shadow-lg max-w-sm">
+              <div class="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
+                <i data-lucide="sparkles" class="w-4 h-4"></i> Tips Emas Exam Fizik UiTM
+              </div>
+              <p class="text-[11px] text-slate-300 leading-relaxed">
+                1. <strong>Radian Mode:</strong> Pastikan kalkulator sentiasa dalam mod <strong>RAD</strong> untuk $x = A\cos(\omega t)$ dan kinematik sudut!<br>
+                2. <strong>Unit Standard:</strong> Ingat tukar cm $\to$ m, g $\to$ kg, min $\to$ s sebelum masuk formula.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MAIN CONTENT TABS CONTAINER -->
+      <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ========================================================================= -->
+        <!-- TAB 1: CHAPTER 7 - ROTATIONAL MOTION -->
+        <!-- ========================================================================= -->
+        <div id="tab-ch7" class="chapter-tab space-y-8">
+          <!-- Header -->
+          <div class="rounded-2xl bg-gradient-to-r from-blue-950/60 via-indigo-950/40 to-slate-900 p-6 border border-blue-800/50 relative overflow-hidden">
+            <div class="relative z-10">
+              <span class="px-3 py-1 rounded-md bg-blue-500/20 text-blue-300 text-xs font-semibold border border-blue-500/30">
+                CHAPTER 7
+              </span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">Rotational Motion (Gerakan Putaran &amp; Membulat)</h2>
+              <p class="text-slate-300 text-xs sm:text-sm mt-1">
+                Pensyarah: Hasnorhafiza binti Husni • UiTM Kampus Dengkil
+              </p>
+              <div class="flex flex-wrap gap-2 mt-3 text-[11px]">
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">7-1: Angular Speed &amp; Acceleration</span>
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">7-2: Constant Angular Acceleration Kinematics</span>
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">7-3: Linear &amp; Angular Relations</span>
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">7-4: Centripetal Acceleration &amp; Forces</span>
+              </div>
+            </div>
+            <div class="absolute right-4 -bottom-6 text-9xl text-blue-500/5 font-black select-none pointer-events-none">
+              CH 7
+            </div>
+          </div>
+
+          <!-- Section 7.1: Concept Breakdown with Visuals -->
+          <div class="rounded-2xl bg-slate-800/70 border border-slate-700 p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700/80 pb-3">
+              <i data-lucide="compass" class="w-5 h-5 text-sky-400"></i>
+              7.1 &amp; 7.3: Konsep Asas Sudut, Radian, dan Hubungan Linear
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+                <h4 class="font-bold text-sky-300 text-sm mb-1">1. Takrifan Radian &amp; Penukaran Unit</h4>
+                <p class="text-slate-300 leading-relaxed">
+                  Radian (rad) ialah nisbah panjang lengkok $s$ kepada jejari bulatan $r$:
+                </p>
+                <div class="p-2 my-2 bg-slate-950 rounded font-mono text-center text-sky-200">
+                  $$\theta = \frac{s}{r} \implies s = r\theta$$
+                </div>
+                <div class="space-y-1 text-slate-400 font-mono text-[11px]">
+                  <p>• $1\text{ rev} = 360^\circ = 2\pi\text{ rad}$</p>
+                  <p>• $1\text{ rad} \approx 57.3^\circ$</p>
+                  <p>• Tukar darjah $\to$ rad: $\theta[\text{rad}] = \frac{\pi}{180^\circ} \times \theta[^\circ]$</p>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+                <h4 class="font-bold text-emerald-300 text-sm mb-1">2. Halaju Sudut &amp; Pecutan Sudut</h4>
+                <p class="text-slate-300 leading-relaxed">
+                  Purata kadar perubahan sesaran sudut dan halaju sudut terhadap masa:
+                </p>
+                <div class="p-2 my-2 bg-slate-950 rounded font-mono text-center text-emerald-200">
+                  $$\omega_{av} = \frac{\Delta\theta}{\Delta t}, \quad \alpha_{av} = \frac{\Delta\omega}{\Delta t}$$
+                </div>
+                <div class="space-y-1 text-slate-400 text-[11px]">
+                  <p>• <strong>Tanda Positif (+):</strong> Pusingan lawan arah jam (Counterclockwise / CCW).</p>
+                  <p>• <strong>Tanda Negatif (-):</strong> Pusingan ikut arah jam (Clockwise / CW).</p>
+                  <p>• Unit: $\omega$ ($\text{rad/s}$), $\alpha$ ($\text{rad/s}^2$).</p>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+                <h4 class="font-bold text-amber-300 text-sm mb-1">3. Konsep Bonnie &amp; Klyde (Merry-Go-Round)</h4>
+                <p class="text-slate-300 leading-relaxed">
+                  Pada objek tegar yang berputar pada paksi tetap (cth: piring CD, carousel), <strong>setiap titik mempunyai $\omega$ dan $\alpha$ yang SAMA</strong>!
+                </p>
+                <div class="p-2 my-2 bg-slate-950 rounded font-mono text-center text-amber-200">
+                  $$v_t = r\omega, \quad a_t = r\alpha$$
+                </div>
+                <p class="text-slate-400 text-[11px]">
+                  Makin jauh titik dari pusat ($r$ bertambah), laju linear $v_t$ makin bertambah!
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 7.2: Kinematics Analogy Table -->
+          <div class="rounded-2xl bg-slate-800/70 border border-slate-700 p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700/80 pb-3">
+              <i data-lucide="table" class="w-5 h-5 text-indigo-400"></i>
+              7.2: Analog Persamaan Kinematik Linear vs Putaran (Constant $\alpha$)
+            </h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Bila pecutan sudut $\alpha$ adalah malar, formula gerakan putaran mempunyai bentuk yang <strong>seiras dengan formula gerakan linear</strong>:
+            </p>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left">
+                <thead>
+                  <tr class="border-b border-slate-700 text-slate-400 uppercase text-[11px] bg-slate-900/60">
+                    <th class="py-2.5 px-3">No</th>
+                    <th class="py-2.5 px-3 text-sky-400">Gerakan Linear ($a = \text{malar}$)</th>
+                    <th class="py-2.5 px-3 text-purple-400">Gerakan Putaran ($\alpha = \text{malar}$)</th>
+                    <th class="py-2.5 px-3 text-amber-400">Penerangan / Petua Ingat</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800 text-slate-300 font-mono">
+                  <tr>
+                    <td class="py-2.5 px-3 text-slate-400 font-sans">1</td>
+                    <td class="py-2.5 px-3">$$v = v_0 + at$$</td>
+                    <td class="py-2.5 px-3 text-purple-300">$$\omega = \omega_0 + \alpha t$$</td>
+                    <td class="py-2.5 px-3 font-sans text-[11px] text-slate-400">Cari halaju akhir jika ada masa $t$</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-3 text-slate-400 font-sans">2</td>
+                    <td class="py-2.5 px-3">$$x = x_0 + \frac{1}{2}(v_0 + v)t$$</td>
+                    <td class="py-2.5 px-3 text-purple-300">$$\theta = \theta_0 + \frac{1}{2}(\omega_0 + \omega)t$$</td>
+                    <td class="py-2.5 px-3 font-sans text-[11px] text-slate-400">Cari sesaran menggunakan purata halaju</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-3 text-slate-400 font-sans">3</td>
+                    <td class="py-2.5 px-3">$$x = x_0 + v_0 t + \frac{1}{2}at^2$$</td>
+                    <td class="py-2.5 px-3 text-purple-300">$$\theta = \theta_0 + \omega_0 t + \frac{1}{2}\alpha t^2$$</td>
+                    <td class="py-2.5 px-3 font-sans text-[11px] text-slate-400">Cari sesaran sudut jika ada $\alpha$ dan $t$</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-3 text-slate-400 font-sans">4</td>
+                    <td class="py-2.5 px-3">$$v^2 = v_0^2 + 2a(x - x_0)$$</td>
+                    <td class="py-2.5 px-3 text-purple-300">$$\omega^2 = \omega_0^2 + 2\alpha(\theta - \theta_0)$$</td>
+                    <td class="py-2.5 px-3 font-sans text-[11px] text-slate-400">Guna bila <strong>tiada masa $t$</strong> diberi!</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Section 7.4: Centripetal Acceleration & Forces -->
+          <div class="rounded-2xl bg-slate-800/70 border border-slate-700 p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700/80 pb-3">
+              <i data-lucide="target" class="w-5 h-5 text-rose-400"></i>
+              7.4: Pecutan &amp; Daya Memusat (Centripetal Acceleration &amp; Force)
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-300">
+              <div class="space-y-3">
+                <h4 class="font-bold text-rose-300 text-sm">1. Gerakan Membulat Seragam vs Tidak Seragam</h4>
+                <p>
+                  <strong>Gerakan Membulat Seragam (UCM):</strong> Laju $v$ malar, tetapi <strong>arah halaju sentiasa berubah</strong>. Perubahan arah ini menghasilkan <strong>pecutan memusat ($a_c$)</strong> yang sentiasa menghala ke pusat bulatan:
+                </p>
+                <div class="p-2.5 bg-slate-900 rounded font-mono text-center text-rose-300 space-y-1">
+                  <div>$$a_c = \frac{v^2}{r} = r\omega^2$$</div>
+                  <div>$$F_c = m a_c = \frac{mv^2}{r} = mr\omega^2$$</div>
+                </div>
+                <p>
+                  <strong>Gerakan Tidak Seragam (Non-uniform):</strong> Jika laju objek juga berubah (ada pecutan tangen $a_t = r\alpha$), maka jumlah pecutan paduan ialah:
+                </p>
+                <div class="p-2.5 bg-slate-900 rounded font-mono text-center text-indigo-300 space-y-1">
+                  <div>$$\vec{a} = \vec{a}_t + \vec{a}_r$$</div>
+                  <div>$$a = \sqrt{a_t^2 + a_c^2}$$</div>
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <h4 class="font-bold text-cyan-300 text-sm">2. Aplikasi Utama Daya Memusat (Exam Core)</h4>
+                <div class="p-3 bg-slate-900/80 rounded-lg space-y-2">
+                  <strong class="text-sky-300 block">A. Selekoh Jalan Rata (Level Curves):</strong>
+                  <p class="text-[11px]">Daya geseran statik tayar membekalkan $F_c$: $f_s = \mu_s mg = m\frac{v^2}{r} \implies \mu_s = \frac{v^2}{rg}$.</p>
+                  
+                  <strong class="text-indigo-300 block pt-1">B. Selekoh Mencondong Bebas Geseran (Banked Curves):</strong>
+                  <p class="text-[11px]">Komponen normal $n\sin\theta = m\frac{v^2}{r}$ dan $n\cos\theta = mg \implies \tan\theta = \frac{v^2}{rg} \implies v = \sqrt{rg\tan\theta}$.</p>
+                  
+                  <strong class="text-pink-300 block pt-1">C. Gelung Menegak Roller Coaster (Vertical Circle):</strong>
+                  <p class="text-[11px]">Di puncak ($n=0$): $v_{top} = \sqrt{gR}$. Di dasar: $v_{bot} = \sqrt{5gR}$ dan $n_{bot} = 6mg$.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE SIMULATION: ROTATIONAL MOTION -->
+          <div class="rounded-2xl bg-slate-800/80 border border-slate-700 p-6 shadow-xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-700/80 pb-4 mb-4">
+              <div>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                  <i data-lucide="play-circle" class="w-5 h-5 text-sky-400"></i>
+                  Makmal Maya Interaktif: Piring Berputar &amp; Vektor Halaju
+                </h3>
+                <p class="text-xs text-slate-400">Ubah halaju sudut $\omega$ &amp; jejari $r$ untuk melihat perbezaan laju linear $v$ dan pecutan memusat $a_c$.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="sim-ch7-playpause" class="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold flex items-center gap-1">
+                  <i data-lucide="pause" class="w-4 h-4"></i> Pause
+                </button>
+                <button id="sim-ch7-reset" class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold">
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+              <div class="lg:col-span-2 relative bg-slate-950 rounded-xl overflow-hidden border border-slate-800 aspect-video flex items-center justify-center">
+                <canvas id="canvas-rotational" class="w-full h-full"></canvas>
+                <div class="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-sm border border-slate-700 px-3 py-1.5 rounded-lg text-xs text-slate-300">
+                  <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 mr-1"></span> Klyde ($r_1$) | 
+                  <span class="inline-block w-2.5 h-2.5 rounded-full bg-pink-400 ml-2 mr-1"></span> Bonnie ($r_2$)
+                </div>
+              </div>
+
+              <div class="space-y-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                <div>
+                  <div class="flex justify-between text-xs font-medium text-slate-300 mb-1">
+                    <span>Halaju Sudut $\omega$</span>
+                    <span id="val-omega" class="text-sky-400 font-mono font-bold">2.00 rad/s</span>
+                  </div>
+                  <input id="slider-omega" type="range" min="0.5" max="6.0" step="0.1" value="2.0" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-400">
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-xs font-medium text-slate-300 mb-1">
+                    <span>Jejari Bonnie $r_2$</span>
+                    <span id="val-radius" class="text-pink-400 font-mono font-bold">1.50 m</span>
+                  </div>
+                  <input id="slider-radius" type="range" min="0.8" max="2.0" step="0.05" value="1.5" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-pink-400">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800">
+                  <div class="p-2.5 rounded-lg bg-slate-800/80 border border-slate-700">
+                    <span class="text-[10px] text-slate-400 block uppercase">Laju Linear Bonnie ($v$)</span>
+                    <span id="calc-v" class="text-sm font-bold font-mono text-emerald-400">3.00 m/s</span>
+                  </div>
+                  <div class="p-2.5 rounded-lg bg-slate-800/80 border border-slate-700">
+                    <span class="text-[10px] text-slate-400 block uppercase">Pecutan Memusat ($a_c$)</span>
+                    <span id="calc-ac" class="text-sm font-bold font-mono text-amber-400">6.00 m/s²</span>
+                  </div>
+                  <div class="p-2.5 rounded-lg bg-slate-800/80 border border-slate-700">
+                    <span class="text-[10px] text-slate-400 block uppercase">Tempoh 1 Putaran ($T$)</span>
+                    <span id="calc-t" class="text-sm font-bold font-mono text-cyan-400">3.14 s</span>
+                  </div>
+                  <div class="p-2.5 rounded-lg bg-slate-800/80 border border-slate-700">
+                    <span class="text-[10px] text-slate-400 block uppercase">Frekuensi ($f$)</span>
+                    <span id="calc-f" class="text-sm font-bold font-mono text-purple-400">0.32 rev/s</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ALL WORKED EXAMPLES & EXERCISES (SLIDES CH 7) -->
+          <div class="rounded-2xl bg-slate-800/60 border border-slate-700 p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
+              <i data-lucide="book-open-check" class="w-5 h-5 text-amber-400"></i>
+              Semua Contoh Soalan &amp; Latihan (Slide Kuliah UiTM Bab 7)
+            </h3>
+
+            <!-- Example 7.1 Whirlybirds -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch7-slide-13')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] font-bold">EXAMPLE 7.1 • SLIDE 13</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Bilah Rotor Helikopter (Whirlybirds)</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Rotor helikopter berputar pada kelajuan sudut $3.20 \times 10^2\text{ rev/min}$. (a) Nyatakan kelajuan sudut ini dalam $\text{rad/s}$. (b) Jika jejari bilah ialah $2.00\text{ m}$, apakah panjang lengkok yang dilalui oleh hujung bilah dalam masa $3.00 \times 10^2\text{ s}$?
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch7-slide-13" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch7-slide-13" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-3 hidden">
+                <div class="p-3 rounded-lg bg-slate-950/60 border border-slate-800">
+                  <strong class="text-sky-300 block mb-1">Penyelesaian (a):</strong>
+                  $$\omega = 3.20 \times 10^2 \frac{\text{rev}}{\text{min}} \times \left(\frac{2\pi\text{ rad}}{1\text{ rev}}\right) \times \left(\frac{1.00\text{ min}}{60.0\text{ s}}\right) = \mathbf{33.5\text{ rad/s}}$$
+                </div>
+                <div class="p-3 rounded-lg bg-slate-950/60 border border-slate-800">
+                  <strong class="text-sky-300 block mb-1">Penyelesaian (b):</strong>
+                  1. $\Delta\theta = \omega t = (33.5\text{ rad/s})(3.00 \times 10^2\text{ s}) = 1.01 \times 10^4\text{ rad}$<br>
+                  2. $\Delta s = r\Delta\theta = (2.00\text{ m})(1.01 \times 10^4\text{ rad}) = \mathbf{2.02 \times 10^4\text{ m}}$
+                </div>
+              </div>
+            </div>
+
+            <!-- Example 7.2 Rotating Wheel -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch7-slide-20')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] font-bold">EXAMPLE 7.2 • SLIDE 20</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Roda Berputar dengan Pecutan Sudut Malar</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Roda berputar dengan pecutan sudut malar $\alpha = 3.50\text{ rad/s}^2$ dan $\omega_i = 2.00\text{ rad/s}$ pada $t = 0$. (a) Cari $\Delta\theta$ dalam masa $2.00\text{ s}$ dalam rad dan rev. (b) Cari $\omega$ pada $t = 2.00\text{ s}$. (c) Apakah sesaran sudut (rev) apabila laju sudut berganda dua dari bahagian (b)?
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch7-slide-20" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch7-slide-20" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>(a)</strong> $\Delta\theta = \omega_i t + \frac{1}{2}\alpha t^2 = (2.00)(2.00) + \frac{1}{2}(3.50)(2.00)^2 = 11.0\text{ rad} = 11.0 \times \frac{1\text{ rev}}{2\pi\text{ rad}} = \mathbf{1.75\text{ rev}}$</p>
+                <p class="mt-2"><strong>(b)</strong> $\omega = \omega_i + \alpha t = 2.00 + (3.50)(2.00) = \mathbf{9.00\text{ rad/s}}$</p>
+                <p class="mt-2"><strong>(c)</strong> Guna $\omega_f^2 - \omega_i^2 = 2\alpha\Delta\theta \implies \Delta\theta = \frac{18.0^2 - 9.00^2}{2(3.50)} = 34.7\text{ rad} = \mathbf{5.52\text{ rev}}$</p>
+              </div>
+            </div>
+
+            <!-- Example 7.3 Compact Discs -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch7-slide-22')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] font-bold">EXAMPLE 7.3 • SLIDE 22 &amp; 23</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Cakera Padat CD &amp; Mikrob</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Cakera padat berputar dari keadaan rehat sehingga $\omega = 31.4\text{ rad/s}$ dalam masa $0.892\text{ s}$. Cari: (a) $\alpha$, (b) $\Delta\theta$, (c) laju tangen $v_t$ mikrob pada $r = 4.45\text{ cm}$, (d) pecutan tangen $a_t$ mikrob.
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch7-slide-22" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch7-slide-22" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>(a)</strong> $\alpha = \frac{\omega}{t} = \frac{31.4\text{ rad/s}}{0.892\text{ s}} = \mathbf{35.2\text{ rad/s}^2}$</p>
+                <p><strong>(b)</strong> $\Delta\theta = 0 + \frac{1}{2}(35.2)(0.892)^2 = \mathbf{14.0\text{ rad}}$</p>
+                <p><strong>(c)</strong> $v_t = r\omega = (0.0445\text{ m})(31.4\text{ rad/s}) = \mathbf{1.40\text{ m/s}}$</p>
+                <p><strong>(d)</strong> $a_t = r\alpha = (0.0445\text{ m})(35.2\text{ rad/s}^2) = \mathbf{1.57\text{ m/s}^2}$</p>
+              </div>
+            </div>
+
+            <!-- Slide 24 & 25 Example: Wheel turning 30 rps -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch7-slide-25')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] font-bold">EXAMPLE • SLIDE 24 &amp; 25</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Roda Berhenti Selepas 60 Putaran</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Roda berputar dengan kelajuan sudut $30\text{ rps}$ diperlahankan dengan pecutan malar sehingga berhenti selepas 60 putaran. (a) Apakah pecutan sudut $\alpha$? (b) Berapakah masa yang diambil $t$?
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch7-slide-25" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch7-slide-25" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>(a)</strong> $\omega_0 = 60\pi\text{ rad/s}$, $\Delta\theta = 120\pi\text{ rad} \implies \alpha = -\frac{3600\pi^2}{240\pi} = \mathbf{-47\text{ rad/s}^2}$</p>
+                <p><strong>(b)</strong> $t = \frac{2(120\pi)}{60\pi} = \mathbf{4\text{ s}}$</p>
+              </div>
+            </div>
+
+            <!-- Slide 28 Exercise: Disc 2 rad/s^2 -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch7-slide-28')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">EXERCISE • SLIDE 28</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Cakera Berdiameter 15 cm Memecut</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Cakera mempunyai pecutan sudut malar $\alpha = 2\text{ rad/s}^2$. Pada $t = 0$, laju tangen ialah $4\text{ m/s}$ dan diameter ialah $15\text{ cm}$. Kira (a) $\omega_0$, (b) $\omega$ dan $\Delta\theta$ pada $t = 8\text{ s}$, (c) $\Delta\theta$ dalam rev, (d) masa untuk 1 pusingan lengkap.
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch7-slide-28" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch7-slide-28" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>(a)</strong> $\omega_0 = \frac{4}{0.075} = \mathbf{53.33\text{ rad/s}}$</p>
+                <p><strong>(b)</strong> $\omega = 53.33 + 2(8) = \mathbf{69.33\text{ rad/s}}$, $\Delta\theta = 53.33(8) + \frac{1}{2}(2)(64) = \mathbf{490.64\text{ rad}}$</p>
+                <p><strong>(c)</strong> $\Delta\theta = \frac{490.64}{2\pi} = \mathbf{78.09\text{ rev}}$</p>
+                <p><strong>(d)</strong> $t^2 + 53.33t - 6.283 = 0 \implies t = \mathbf{117.30\text{ ms}}$</p>
+              </div>
+            </div>
+
+            <!-- Slide 29 Exercise: Pulley 5.0 cm -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch7-slide-29')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">EXERCISE • SLIDE 29</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Takal Motor dan Panjang Tali Sawat yang Digulung</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Takal $r = 5.0\text{ cm}$ pada motor berputar $30\text{ rev/s}$ dan diperlahankan kepada $20\text{ rev/s}$ dalam masa $2.0\text{ s}$. Kira: (i) $\alpha$, (ii) bilangan pusingan (rev), (iii) panjang tali sawat yang digulung.
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch7-slide-29" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch7-slide-29" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>(i)</strong> $\alpha = \frac{20(2\pi) - 30(2\pi)}{2.0} = \mathbf{-10\pi\text{ rad/s}^2}$</p>
+                <p><strong>(ii)</strong> $\theta = \frac{1}{2}(30 + 20)(2.0) = \mathbf{50\text{ rev}}$</p>
+                <p><strong>(iii)</strong> Panjang tali sawat $\Delta s = (0.05)(50 \times 2\pi) = \mathbf{16\text{ m}}$</p>
+              </div>
+            </div>
+
+            <!-- Slide 52 & 53 Quick Exercises -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch7-slide-52')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">EXERCISE Q1 - Q5 • SLIDE 52 &amp; 53</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Latihan Pengiraan Daya &amp; Pecutan Memusat</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Himpunan soalan latihan cepat: syiling pusing, bola diikat tali, orbit Bumi, dan kereta membelok.
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch7-slide-52" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch7-slide-52" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>Q1 (Penny):</strong> $r = 0.45\text{ m}, v = 2.5\text{ m/s} \implies a_c = \frac{2.5^2}{0.45} = \mathbf{13.9\text{ m/s}^2}$</p>
+                <p><strong>Q2 (Ball in horizontal circle):</strong> $r = 1.5\text{ m}, f = 3\text{ rev/s} \implies T = 1/3\text{ s}, v = \mathbf{28.27\text{ m/s}}, a_c = \mathbf{533\text{ m/s}^2}$</p>
+                <p><strong>Q3 (Orbit Bumi):</strong> $r = 1.5 \times 10^{11}\text{ m}, T = 3.156 \times 10^7\text{ s} \implies a_c = \mathbf{5.95 \times 10^{-3}\text{ m/s}^2}$</p>
+                <p><strong>Q4 (Bola 0.25kg):</strong> $r = 1.5\text{ m}, v = 30\text{ m/s} \implies F_c = \mathbf{150\text{ N}}$</p>
+                <p><strong>Q5 (Kereta 500kg):</strong> $v = 12\text{ m/s}, F_c = 9600\text{ N} \implies r = \mathbf{7.5\text{ m}}$</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE QUIZ CHAPTER 7 (INSIDE TAB-CH7) -->
+          <div class="rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border border-sky-900/50 p-6 shadow-xl">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-700/80 pb-3">
+              <div>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                  <i data-lucide="award" class="w-5 h-5 text-emerald-400"></i>
+                  Ujian Kefahaman Amal: Bab 7
+                </h3>
+                <p class="text-xs text-slate-400">Pilih jawapan yang tepat. Klik 'Semak' untuk lihat jalan kira &amp; tip.</p>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-slate-800 text-xs text-sky-400 font-mono border border-slate-700">
+                3 Soalan Pantas
+              </span>
+            </div>
+
+            <div class="space-y-6" id="quiz-ch7-container">
+              <!-- Q1 -->
+              <div class="quiz-item p-4 rounded-xl bg-slate-900/70 border border-slate-800" data-qid="ch7_q1">
+                <p class="text-sm font-semibold text-slate-200">
+                  1. Bonnie duduk di tepi piring putar ($r = 2\text{ m}$) dan Klyde duduk di tengah ($r = 1\text{ m}$). Piring berputar 1 pusingan setiap 2 saat. Pernyataan manakah yang BENAR?
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-xs">
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch7_q1" value="A" class="accent-sky-500">
+                    <span>(A) Halaju sudut $\omega$ Klyde adalah separuh daripada Bonnie</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch7_q1" value="B" class="accent-sky-500">
+                    <span>(B) Halaju sudut $\omega$ Bonnie dan Klyde adalah SAMA</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch7_q1" value="C" class="accent-sky-500">
+                    <span>(C) Laju linear $v$ Bonnie adalah separuh daripada Klyde</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch7_q1" value="D" class="accent-sky-500">
+                    <span>(D) Pecutan memusat kedua-duanya adalah sama</span>
+                  </label>
+                </div>
+                <div class="quiz-feedback hidden mt-3 p-3 rounded-lg text-xs leading-relaxed"></div>
+              </div>
+
+              <!-- Q2 -->
+              <div class="quiz-item p-4 rounded-xl bg-slate-900/70 border border-slate-800" data-qid="ch7_q2">
+                <p class="text-sm font-semibold text-slate-200">
+                  2. Sebuah duit syiling diletakkan pada jarak $r = 0.45\text{ m}$ dari pusat cakera yang berputar dengan laju linear malar $v = 2.5\text{ m/s}$. Berapakah pecutan memusat $a_c$?
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-xs">
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch7_q2" value="A" class="accent-sky-500">
+                    <span>(A) $5.56\text{ m/s}^2$</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch7_q2" value="B" class="accent-sky-500">
+                    <span>(B) $13.9\text{ m/s}^2$</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch7_q2" value="C" class="accent-sky-500">
+                    <span>(C) $31.2\text{ m/s}^2$</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch7_q2" value="D" class="accent-sky-500">
+                    <span>(D) $1.13\text{ m/s}^2$</span>
+                  </label>
+                </div>
+                <div class="quiz-feedback hidden mt-3 p-3 rounded-lg text-xs leading-relaxed"></div>
+              </div>
+
+              <!-- Q3 -->
+              <div class="quiz-item p-4 rounded-xl bg-slate-900/70 border border-slate-800" data-qid="ch7_q3">
+                <p class="text-sm font-semibold text-slate-200">
+                  3. Kereta berjisim $500\text{ kg}$ membelok pada selekoh dengan laju $12\text{ m/s}$. Jika daya memusat yang bertindak ialah $9600\text{ N}$, berapakah jejari selekoh tersebut?
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-xs">
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch7_q3" value="A" class="accent-sky-500">
+                    <span>(A) $7.5\text{ m}$</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch7_q3" value="B" class="accent-sky-500">
+                    <span>(B) $15.0\text{ m}$</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch7_q3" value="C" class="accent-sky-500">
+                    <span>(C) $24.0\text{ m}$</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch7_q3" value="D" class="accent-sky-500">
+                    <span>(D) $3.75\text{ m}$</span>
+                  </label>
+                </div>
+                <div class="quiz-feedback hidden mt-3 p-3 rounded-lg text-xs leading-relaxed"></div>
+              </div>
+            </div>
+
+            <div class="mt-5 flex items-center justify-end gap-3">
+              <button onclick="checkQuiz('ch7')" class="px-5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-bold text-xs shadow-lg shadow-sky-500/25 flex items-center gap-1.5">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i> Semak Jawapan Bab 7
+              </button>
+            </div>
+          </div>
+        </div> <!-- END TAB-CH7 -->
+
+        <!-- ========================================================================= -->
+        <!-- TAB 2: CHAPTER 9 - SOLIDS AND FLUIDS -->
+        <!-- ========================================================================= -->
+        <div id="tab-ch9" class="chapter-tab space-y-8 hidden">
+          <!-- Header -->
+          <div class="rounded-2xl bg-gradient-to-r from-teal-950/60 via-emerald-950/40 to-slate-900 p-6 border border-teal-800/50 relative overflow-hidden">
+            <div class="relative z-10">
+              <span class="px-3 py-1 rounded-md bg-teal-500/20 text-teal-300 text-xs font-semibold border border-teal-500/30">
+                CHAPTER 9
+              </span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">Solids and Fluids (Pepejal dan Bendalir)</h2>
+              <p class="text-slate-300 text-xs sm:text-sm mt-1">
+                Pensyarah: Hasnorhafiza binti Husni • UiTM Kampus Dengkil
+              </p>
+              <div class="flex flex-wrap gap-2 mt-3 text-[11px]">
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">9.5: Buoyant Forces &amp; Archimedes' Principle</span>
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">9.10: The Deformation of Solids &amp; Moduli</span>
+              </div>
+            </div>
+            <div class="absolute right-4 -bottom-6 text-9xl text-teal-500/5 font-black select-none pointer-events-none">
+              CH 9
+            </div>
+          </div>
+
+          <!-- Section 9.5: Archimedes' Principle -->
+          <div class="rounded-2xl bg-slate-800/70 border border-slate-700 p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700/80 pb-3">
+              <i data-lucide="droplet" class="w-5 h-5 text-teal-400"></i>
+              9.5: Prinsip Archimedes &amp; Daya Apungan (Buoyant Force)
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-300">
+              <div class="space-y-3">
+                <h4 class="font-bold text-teal-300 text-sm">Pernyataan Prinsip &amp; Asal-Usul Fizikal:</h4>
+                <p>
+                  Mana-mana objek yang tenggelam sebahagian atau sepenuhnya dalam bendalir akan mengalami <strong>daya apungan ke atas ($F_B$)</strong> yang nilainya <strong>sama dengan berat bendalir yang disesarkan</strong> oleh objek tersebut:
+                </p>
+                <div class="p-2.5 bg-slate-900 rounded font-mono text-center text-teal-200">
+                  $$F_B = W_{fluid} = \rho_{fluid} V_{displaced} g$$
+                </div>
+                <p>
+                  <strong>Punca Fizikal Daya Apungan:</strong> Disebabkan oleh perbezaan tekanan bendalir antara bahagian atas dan bawah objek (tekanan di dasar cecair lebih tinggi $\Delta P = \rho g h$).
+                </p>
+              </div>
+
+              <div class="space-y-3">
+                <h4 class="font-bold text-emerald-300 text-sm">Perbandingan: Tenggelam Sepenuhnya vs Terapung</h4>
+                <div class="p-3 bg-slate-900/80 rounded-lg space-y-2 font-mono text-[11px]">
+                  <p><strong>1. Tenggelam Sepenuhnya:</strong> $V_{fluid} = V_{obj}$</p>
+                  <p class="text-sky-300">$$\text{Daya Paduan} = B - w = (\rho_{fluid} - \rho_{obj}) V_{obj} g$$</p>
+                  <p class="font-sans text-slate-400">• Jika $\rho_{obj} < \rho_{fluid}$ $\to$ memecut ke atas (terapung).</p>
+                  <p class="font-sans text-slate-400">• Jika $\rho_{obj} > \rho_{fluid}$ $\to$ tenggelam ke dasar.</p>
+                  
+                  <p class="pt-2"><strong>2. Objek Terapung (Keseimbangan Statik):</strong> $w = B$</p>
+                  <p class="text-amber-300">$$\frac{\rho_{obj}}{\rho_{fluid}} = \frac{V_{fluid}}{V_{obj}} = \text{Pecahan Isipadu Tenggelam}$$</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 9.10: Deformation of Solids -->
+          <div class="rounded-2xl bg-slate-800/70 border border-slate-700 p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700/80 pb-3">
+              <i data-lucide="layers" class="w-5 h-5 text-indigo-400"></i>
+              9.10: Deformasi Pepejal, Graf Stress-Strain, &amp; 3 Modulus Keanjalan
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <!-- Young -->
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                <span class="px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 text-[10px] font-bold">MODULUS 1</span>
+                <h4 class="font-bold text-white text-sm">Young's Modulus ($Y$)</h4>
+                <p class="text-slate-300">Keanjalan Panjang (Tegangan atau Mampatan):</p>
+                <div class="p-2 bg-slate-950 rounded font-mono text-center text-teal-300">
+                  $$\frac{F}{A} = Y \left(\frac{\Delta L}{L_0}\right)$$
+                </div>
+                <p class="text-slate-400 text-[11px]">• $\text{Stress} = \frac{F}{A}$ (Pa atau $\text{N/m}^2$)<br>• $\text{Strain} = \frac{\Delta L}{L_0}$ (tiada unit)</p>
+              </div>
+
+              <!-- Shear -->
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold">MODULUS 2</span>
+                <h4 class="font-bold text-white text-sm">Shear Modulus ($S$)</h4>
+                <p class="text-slate-300">Keanjalan Bentuk (Daya sisi/lateral):</p>
+                <div class="p-2 bg-slate-950 rounded font-mono text-center text-indigo-300">
+                  $$\frac{F}{A} = S \left(\frac{\Delta x}{h}\right)$$
+                </div>
+                <p class="text-slate-400 text-[11px]">• Mengukur kesukaran objek melendut/senget (cth: dahan kayu, buku tebal).</p>
+              </div>
+
+              <!-- Bulk -->
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                <span class="px-2 py-0.5 rounded bg-pink-500/20 text-pink-300 text-[10px] font-bold">MODULUS 3</span>
+                <h4 class="font-bold text-white text-sm">Bulk Modulus ($B$)</h4>
+                <p class="text-slate-300">Keanjalan Isipadu (Mampatan Seragam):</p>
+                <div class="p-2 bg-slate-950 rounded font-mono text-center text-pink-300">
+                  $$\Delta P = -B \left(\frac{\Delta V}{V_0}\right)$$
+                </div>
+                <p class="text-slate-400 text-[11px]">• Tanda negatif menunjukkan peningkatan tekanan ($\Delta P > 0$) mengecilkan isipadu ($\Delta V < 0$).</p>
+              </div>
+            </div>
+
+            <!-- Stress Strain Curve points -->
+            <div class="p-4 bg-slate-900/60 rounded-xl border border-slate-800 text-xs space-y-2">
+              <h4 class="font-bold text-amber-400 text-xs uppercase tracking-wider">Ciri-Ciri Utama Graf Stress vs Strain:</h4>
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 text-slate-300 text-[11px]">
+                <div class="p-2 rounded bg-slate-800/80">
+                  <strong class="text-sky-300 block">1. Zon Linear:</strong>
+                  Stress berkadar terus dengan strain (Hukum Hooke). Kecerunan $= \text{Modulus}$.
+                </div>
+                <div class="p-2 rounded bg-slate-800/80">
+                  <strong class="text-emerald-300 block">2. Had Keanjalan (Elastic Limit):</strong>
+                  Jika daya ditarik melepasi had ini, bahan mengalami deformasi kekal.
+                </div>
+                <div class="p-2 rounded bg-slate-800/80">
+                  <strong class="text-amber-300 block">3. Ultimate Strength:</strong>
+                  Tegasan maksimum yang boleh ditampung oleh bahan sebelum pecah/putus.
+                </div>
+                <div class="p-2 rounded bg-slate-800/80">
+                  <strong class="text-rose-300 block">4. Titik Pecah (Breaking Point):</strong>
+                  Bahan rapuh (brittle) pecah serta merta; bahan mulur (ductile) meregang/menirus dahulu.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE SIMULATION: ARCHIMEDES BEAKER -->
+          <div class="rounded-2xl bg-slate-800/80 border border-slate-700 p-6 shadow-xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-700/80 pb-4 mb-4">
+              <div>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                  <i data-lucide="droplets" class="w-5 h-5 text-teal-400"></i>
+                  Makmal Maya Interaktif: Ujian Apungan &amp; Neraca Archimedes
+                </h3>
+                <p class="text-xs text-slate-400">Ubah ketumpatan objek &amp; cecair untuk lihat keadaan terapung / tenggelam serta bacaan neraca spring!</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+              <div class="lg:col-span-2 relative bg-slate-950 rounded-xl overflow-hidden border border-slate-800 aspect-video flex items-center justify-center">
+                <canvas id="canvas-archimedes" class="w-full h-full"></canvas>
+              </div>
+
+              <div class="space-y-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                <div>
+                  <div class="flex justify-between text-xs font-medium text-slate-300 mb-1">
+                    <span>Ketumpatan Objek ($\rho_{obj}$)</span>
+                    <span id="val-rho-obj" class="text-teal-400 font-mono font-bold">600 kg/m³</span>
+                  </div>
+                  <input id="slider-rho-obj" type="range" min="200" max="2500" step="50" value="600" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-teal-400">
+                  <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+                    <span>Kayu (600)</span>
+                    <span>Air (1000)</span>
+                    <span>Aluminium (2700)</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-xs font-medium text-slate-300 mb-1">
+                    <span>Isipadu Objek ($V$)</span>
+                    <span id="val-vol-obj" class="text-emerald-400 font-mono font-bold">0.005 m³</span>
+                  </div>
+                  <input id="slider-vol-obj" type="range" min="0.001" max="0.010" step="0.001" value="0.005" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-400">
+                </div>
+
+                <div class="space-y-2 pt-2 border-t border-slate-800 text-xs">
+                  <div class="flex justify-between p-2 rounded bg-slate-800/80">
+                    <span class="text-slate-400">Berat Sebenar ($W = mg$):</span>
+                    <span id="calc-weight" class="font-mono font-bold text-amber-400">29.40 N</span>
+                  </div>
+                  <div class="flex justify-between p-2 rounded bg-slate-800/80">
+                    <span class="text-slate-400">Daya Apungan ($F_B$):</span>
+                    <span id="calc-fb" class="font-mono font-bold text-teal-400">29.40 N</span>
+                  </div>
+                  <div class="flex justify-between p-2 rounded bg-slate-800/80">
+                    <span class="text-slate-400">Status Apungan:</span>
+                    <span id="calc-status" class="font-bold text-emerald-400">Terapung 60% Tenggelam</span>
+                  </div>
+                  <div class="flex justify-between p-2 rounded bg-slate-800/80">
+                    <span class="text-slate-400">Bacaan Neraca (Berat Ketara):</span>
+                    <span id="calc-apparent" class="font-mono font-bold text-pink-400">0.00 N</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ALL WORKED EXAMPLES & EXERCISES (SLIDES CH 9) -->
+          <div class="rounded-2xl bg-slate-800/60 border border-slate-700 p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
+              <i data-lucide="book-open-check" class="w-5 h-5 text-amber-400"></i>
+              Semua Contoh Soalan &amp; Latihan (Slide Kuliah UiTM Bab 9)
+            </h3>
+
+            <!-- Example Gold Crown Fake -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch9-slide-13')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-teal-500/20 text-teal-300 text-[10px] font-bold">EXAMPLE • SLIDE 13</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Ujian Ketulenan Mahkota Emas Archimedes</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Berat mahkota di udara ialah $7.84\text{ N}$, manakala berat semasa tenggelam di dalam air ialah $6.86\text{ N}$. Tentukan sama ada mahkota tersebut emas tulen ($\rho_{gold} = 19.3 \times 10^3\text{ kg/m}^3$).
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch9-slide-13" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch9-slide-13" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p>1. Jisim $m = \frac{7.84}{9.80} = 0.80\text{ kg}$</p>
+                <p>2. Daya Apungan $B = T_1 - T_2 = 7.84 - 6.86 = 0.98\text{ N}$</p>
+                <p>3. Isipadu $V = \frac{B}{\rho_w g} = \frac{0.98}{(1000)(9.80)} = 1.0 \times 10^{-4}\text{ m}^3$</p>
+                <p>4. Ketumpatan $\rho = \frac{m}{V} = \frac{0.80}{1.0 \times 10^{-4}} = \mathbf{8.0 \times 10^3\text{ kg/m}^3}$ (Bukan emas tulen!).</p>
+              </div>
+            </div>
+
+            <!-- Slide 18 Exercise: Table Tennis Ball -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch9-slide-18')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">EXERCISE • SLIDE 18</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Bola Pingpong Ditenggelamkan ke Dalam Air</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Bola pingpong berdiameter $3.80\text{ cm}$ dan ketumpatan purata $0.0840\text{ g/cm}^3$. Apakah daya yang diperlukan untuk menahannya tenggelam sepenuhnya di bawah air?
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch9-slide-18" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch9-slide-18" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p>Jejari $r = 0.019\text{ m}$, isipadu $V = \frac{4}{3}\pi r^3 = 2.873 \times 10^{-5}\text{ m}^3$.</p>
+                <p>Daya Apungan $F_B = (1000)(2.873 \times 10^{-5})(9.80) = 0.2816\text{ N}$.</p>
+                <p>Berat bola $mg = \rho_{ball} V g = (84.0)(2.873 \times 10^{-5})(9.80) = 0.0236\text{ N}$.</p>
+                <p>Daya luaran diperlukan $= F_B - mg = 0.2816 - 0.0236 = \mathbf{0.258\text{ N}}$ (menghala ke bawah).</p>
+              </div>
+            </div>
+
+            <!-- Example 9.2 Built to Last (Steel beam) -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch9-slide-29')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] font-bold">EXAMPLE 9.2 • SLIDE 29 &amp; 30</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Mampatan Rasuk Keluli Bangunan (Built to Last)</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Rasuk keluli menegak menampung beban $6.0 \times 10^4\text{ N}$, $L_0 = 4.0\text{ m}$, $A = 8.0 \times 10^{-3}\text{ m}^2$. (a) Cari jarak mampatan $\Delta L$. (b) Apakah beban maksimum yang boleh ditampung jika had kekuatan ialah $5.0 \times 10^8\text{ Pa}$?
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch9-slide-29" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch9-slide-29" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>(a)</strong> $\Delta L = \frac{F L_0}{Y A} = \frac{(6.0 \times 10^4)(4.0)}{(2.0 \times 10^{11})(8.0 \times 10^{-3})} = \mathbf{1.5 \times 10^{-4}\text{ m}}$</p>
+                <p><strong>(b)</strong> $F = \text{Stress} \times A = (5.0 \times 10^8\text{ Pa})(8.0 \times 10^{-3}\text{ m}^2) = \mathbf{4.0 \times 10^6\text{ N}}$</p>
+              </div>
+            </div>
+
+            <!-- Slide 34 Example: Gelatin Cube -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch9-slide-34')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] font-bold">EXAMPLE • SLIDE 34</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Daya Ricih pada Kiub Gelatin</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Permukaan atas kiub gelatin bersisi $5.0\text{ cm}$ dianjakkan sebanyak $0.64\text{ cm}$. Jika Modulus Ricih $S = 940\text{ Pa}$, cari daya tangen $F$.
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch9-slide-34" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch9-slide-34" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p>$$F = S A \left(\frac{\Delta x}{L}\right) = (940\text{ N/m}^2)(0.0025\text{ m}^2)\left(\frac{0.64\text{ cm}}{5.0\text{ cm}}\right) = \mathbf{0.30\text{ N}}$$</p>
+              </div>
+            </div>
+
+            <!-- Slide 39 Example: Gold Doubloon -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch9-slide-39')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-[10px] font-bold">EXAMPLE • SLIDE 39</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Mampatan Pukal Duit Syiling Emas di Dasar Laut</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Duit syiling emas ($d = 6.1\text{ cm}$, tebal $2.0\text{ mm}$) dijatuhkan ke kedalaman laut $770\text{ m}$. Berapakah perubahan isipadunya $\Delta V$? ($\rho_{sea} = 1.025 \times 10^3\text{ kg/m}^3, B = 22 \times 10^{10}\text{ N/m}^2$)
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch9-slide-39" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch9-slide-39" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p>$$\Delta V = -\frac{V_0 \Delta P}{B} = -\frac{(5.8 \times 10^{-6})(7.7 \times 10^6)}{22 \times 10^{10}} = \mathbf{-2.0 \times 10^{-10}\text{ m}^3}$$</p>
+              </div>
+            </div>
+
+            <!-- Slide 40, 41, 42 Exercises -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch9-slide-40')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">EXERCISE 1 - 4 • SLIDE 40, 41, 42</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Latihan Lengkap Modulus Young, Shear, &amp; Bulk</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Pendaki tali nilon, dawai keluli, cimpanzi bergayut pada ranting, dan jurang lautan Marianas.
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch9-slide-40" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch9-slide-40" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>Ex 1 (Pendaki Nilon):</strong> $m = \mathbf{67\text{ kg}}$</p>
+                <p><strong>Ex 2 (Dawai Keluli):</strong> $d = \mathbf{3.1\text{ mm}}$</p>
+                <p><strong>Ex 3 (Cimpanzi):</strong> $S = \frac{mg L}{A \Delta x} = \mathbf{1.1 \times 10^6\text{ N/m}^2}$</p>
+                <p><strong>Ex 4 (Jurang Marianas):</strong> $\Delta V = -V_0\frac{\Delta P}{B} = \mathbf{-1.4 \times 10^{-6}\text{ m}^3}$</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE QUIZ CHAPTER 9 (INSIDE TAB-CH9) -->
+          <div class="rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border border-teal-900/50 p-6 shadow-xl">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-700/80 pb-3">
+              <div>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                  <i data-lucide="award" class="w-5 h-5 text-teal-400"></i>
+                  Ujian Kefahaman Amal: Bab 9
+                </h3>
+                <p class="text-xs text-slate-400">Pilih jawapan yang betul untuk menguji penguasaan konsep.</p>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-slate-800 text-xs text-teal-400 font-mono border border-slate-700">
+                2 Soalan Pantas
+              </span>
+            </div>
+
+            <div class="space-y-6" id="quiz-ch9-container">
+              <div class="quiz-item p-4 rounded-xl bg-slate-900/70 border border-slate-800" data-qid="ch9_q1">
+                <p class="text-sm font-semibold text-slate-200">
+                  1. Bola pingpong ($d = 3.80\text{ cm}$, $\rho = 84\text{ kg/m}^3$) ditolak masuk ke dalam air sepenuhnya. Apakah daya yang diperlukan untuk menahannya kekal di bawah air?
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-xs">
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch9_q1" value="A" class="accent-teal-500">
+                    <span>(A) $0.258\text{ N}$ menghala ke bawah</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch9_q1" value="B" class="accent-teal-500">
+                    <span>(B) $0.282\text{ N}$ menghala ke atas</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch9_q1" value="C" class="accent-teal-500">
+                    <span>(C) $0.024\text{ N}$ menghala ke bawah</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch9_q1" value="D" class="accent-teal-500">
+                    <span>(D) $0.516\text{ N}$ menghala ke atas</span>
+                  </label>
+                </div>
+                <div class="quiz-feedback hidden mt-3 p-3 rounded-lg text-xs leading-relaxed"></div>
+              </div>
+
+              <div class="quiz-item p-4 rounded-xl bg-slate-900/70 border border-slate-800" data-qid="ch9_q2">
+                <p class="text-sm font-semibold text-slate-200">
+                  2. Pada graf Stress vs Strain, apakah yang diwakili oleh kecerunan (gradient) bahagian linear awal garisan?
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-xs">
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch9_q2" value="A" class="accent-teal-500">
+                    <span>(A) Titik Pecah (Breaking Point)</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch9_q2" value="B" class="accent-teal-500">
+                    <span>(B) Modulus Keanjalan / Kekakuan Bahan</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch9_q2" value="C" class="accent-teal-500">
+                    <span>(C) Had Keanjalan (Elastic Limit)</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch9_q2" value="D" class="accent-teal-500">
+                    <span>(D) Kekuatan Maksimum (Ultimate Strength)</span>
+                  </label>
+                </div>
+                <div class="quiz-feedback hidden mt-3 p-3 rounded-lg text-xs leading-relaxed"></div>
+              </div>
+            </div>
+
+            <div class="mt-5 flex items-center justify-end gap-3">
+              <button onclick="checkQuiz('ch9')" class="px-5 py-2 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-bold text-xs shadow-lg shadow-teal-500/25 flex items-center gap-1.5">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i> Semak Jawapan Bab 9
+              </button>
+            </div>
+          </div>
+        </div> <!-- END TAB-CH9 -->
+
+        <!-- ========================================================================= -->
+        <!-- TAB 3: CHAPTER 11 - THERMAL PROCESSES -->
+        <!-- ========================================================================= -->
+        <div id="tab-ch11" class="chapter-tab space-y-8 hidden">
+          <!-- Header -->
+          <div class="rounded-2xl bg-gradient-to-r from-amber-950/60 via-orange-950/40 to-slate-900 p-6 border border-amber-800/50 relative overflow-hidden">
+            <div class="relative z-10">
+              <span class="px-3 py-1 rounded-md bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/30">
+                CHAPTER 11
+              </span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">Energy in Thermal Processes (Proses Terma)</h2>
+              <p class="text-slate-300 text-xs sm:text-sm mt-1">
+                Pensyarah: Hasnorhafiza binti Husni • UiTM Kampus Dengkil
+              </p>
+              <div class="flex flex-wrap gap-2 mt-3 text-[11px]">
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">11-1: Heat &amp; Internal Energy</span>
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">11-2: Specific Heat &amp; Heat Capacity</span>
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">11-3: Calorimetry</span>
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">11-4: Latent Heat &amp; Phase Changes</span>
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">11-5: Energy Transfer (Conduction)</span>
+              </div>
+            </div>
+            <div class="absolute right-4 -bottom-6 text-9xl text-amber-500/5 font-black select-none pointer-events-none">
+              CH 11
+            </div>
+          </div>
+
+          <!-- Section 11.1 & 11.2 Concept Breakdown -->
+          <div class="rounded-2xl bg-slate-800/70 border border-slate-700 p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700/80 pb-3">
+              <i data-lucide="flame" class="w-5 h-5 text-amber-400"></i>
+              11.1 &amp; 11.2: Haba ($Q$), Tenaga Dalaman ($U$), dan Muatan Haba Tentu ($c$)
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                <h4 class="font-bold text-amber-300 text-sm">1. Haba vs Tenaga Dalaman</h4>
+                <p class="text-slate-300">
+                  <strong>Tenaga Dalaman ($U$):</strong> Jumlah tenaga kinetik mikroskopik zarah (translasi, putaran, getaran) serta tenaga keupayaan ikatan.<br>
+                  <strong>Haba ($Q$):</strong> Tenaga yang <em>berpindah</em> antara sistem dan persekitaran akibat perbezaan suhu.
+                </p>
+                <div class="p-2 bg-slate-950 rounded font-mono text-[11px] text-amber-200">
+                  $$1\text{ cal} = 4.186\text{ J}$$
+                  $$1\text{ Cal (Makanan)} = 1\text{ kcal} = 4186\text{ J}$$
+                </div>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                <h4 class="font-bold text-orange-300 text-sm">2. Muatan Haba Tentu ($c$)</h4>
+                <p class="text-slate-300">
+                  Jumlah tenaga haba yang diperlukan untuk menaikkan suhu $1\text{ kg}$ bahan sebanyak $1^\circ\text{C}$:
+                </p>
+                <div class="p-2 bg-slate-950 rounded font-mono text-center text-orange-200">
+                  $$Q = m c \Delta T, \quad \Delta T = T_f - T_i$$
+                </div>
+                <p class="text-slate-400 text-[11px]">
+                  • $Q > 0$ bila haba diserap (suhu naik).<br>
+                  • $Q < 0$ bila haba dibebaskan (suhu turun).
+                </p>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                <h4 class="font-bold text-cyan-300 text-sm">3. Kenapa Air Mempunyai $c$ Tinggi?</h4>
+                <p class="text-slate-300">
+                  Air ($c = 4186\text{ J/kg}\cdot^\circ\text{C}$) memerlukan haba yang sangat banyak untuk naik suhu berbanding daratan/logam ($c_{Al}=900, c_{Fe}=448$).
+                </p>
+                <p class="text-slate-400 text-[11px]">
+                  <strong>Fenomena Bayu Laut:</strong> Pada waktu siang, tanah cepat panas $\to$ udara atas tanah naik $\to$ udara sejuk dari laut bertiup ke darat (bayu laut).
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 11.4: Latent Heat & Heating Curve -->
+          <div class="rounded-2xl bg-slate-800/70 border border-slate-700 p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700/80 pb-3">
+              <i data-lucide="thermometer" class="w-5 h-5 text-amber-400"></i>
+              11.4: Haba Pendam (Latent Heat) &amp; Perubahan Fasa
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-300">
+              <div class="space-y-3">
+                <p>
+                  Semasa fasa melebur atau mendidih, <strong>suhu TIDAK BERUBAH</strong> walaupun haba terus dibekalkan. Tenaga haba ini disebut <strong>Haba Pendam (Latent = Tersembunyi)</strong> kerana digunakan untuk memutuskan ikatan antara molekul:
+                </p>
+                <div class="p-2.5 bg-slate-900 rounded font-mono text-center text-amber-300">
+                  $$Q = \pm m L$$
+                </div>
+                <div class="space-y-1 text-slate-400 text-[11px]">
+                  <p>• <strong>Haba Pendam Pelakuran ($L_f$):</strong> Untuk lebur / beku ($L_{f,water} = 3.33 \times 10^5\text{ J/kg}$).</p>
+                  <p>• <strong>Haba Pendam Pengewapan ($L_v$):</strong> Untuk didih / kondensasi ($L_{v,water} = 2.26 \times 10^6\text{ J/kg}$).</p>
+                  <p>• <strong>Pemejalwapan (Sublimation):</strong> Perubahan terus pepejal $\to$ gas (cth: Ais Kering / Karbon Dioksida beku).</p>
+                </div>
+              </div>
+
+              <!-- Conduction Formula Box -->
+              <div class="p-4 bg-slate-900/80 rounded-xl border border-slate-800 space-y-2">
+                <h4 class="font-bold text-orange-300 text-sm">11.5: Kadar Konduksi Haba Melalui Bahan</h4>
+                <p>Haba mengalir terus melalui pepejal dari bahagian panas ($T_h$) ke bahagian sejuk ($T_c$):</p>
+                <div class="p-2 bg-slate-950 rounded font-mono text-center text-orange-300">
+                  $$P = \frac{Q}{\Delta t} = k A \left(\frac{T_h - T_c}{L}\right)$$
+                </div>
+                <p class="text-slate-400 text-[11px]">• $k$ = Kekonduksian Terma (Logam tinggi $k$, Penebat seperti kaca/gabus/udara rendah $k$).</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE HEATING CURVE (ICE TO STEAM) -->
+          <div class="rounded-2xl bg-slate-800/80 border border-slate-700 p-6 shadow-xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-700/80 pb-4 mb-4">
+              <div>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                  <i data-lucide="flame" class="w-5 h-5 text-amber-400"></i>
+                  Makmal Interaktif: Graf Pemanasan Ais (-30°C) (\to) Stim (120°C)
+                </h3>
+                <p class="text-xs text-slate-400">Klik / seret slider tenaga haba untuk melihat perubahan suhu &amp; fasa cecair!</p>
+              </div>
+              <div class="text-xs font-mono text-amber-300 bg-amber-950/60 px-3 py-1.5 rounded-lg border border-amber-800/50">
+                Jisim Ais: <strong>1.00 gram</strong>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+              <div class="lg:col-span-2 relative bg-slate-950 rounded-xl overflow-hidden border border-slate-800 aspect-video flex items-center justify-center">
+                <canvas id="canvas-thermal" class="w-full h-full"></canvas>
+              </div>
+
+              <div class="space-y-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                <div>
+                  <div class="flex justify-between text-xs font-medium text-slate-300 mb-1">
+                    <span>Input Tenaga Haba Diisi ($Q$)</span>
+                    <span id="val-thermal-q" class="text-amber-400 font-mono font-bold">500 J</span>
+                  </div>
+                  <input id="slider-thermal-q" type="range" min="0" max="3110" step="10" value="500" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-400">
+                </div>
+
+                <div class="p-3 rounded-lg bg-slate-800/80 border border-slate-700 text-xs space-y-2">
+                  <div class="flex justify-between">
+                    <span class="text-slate-400">Fasa Semasa:</span>
+                    <span id="thermal-phase-name" class="font-bold text-emerald-400">Air Cecair (Liquid)</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-400">Suhu Semasa:</span>
+                    <span id="thermal-temp-val" class="font-mono font-bold text-amber-300">25.0 °C</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-400">Persamaan Terlibat:</span>
+                    <span id="thermal-formula-name" class="font-mono text-sky-300">$Q = mc\Delta T$</span>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-5 gap-1 text-[10px] text-center font-mono">
+                  <button onclick="setThermalQ(30)" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">A<br>Panas Ais</button>
+                  <button onclick="setThermalQ(200)" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">B<br>Lebur</button>
+                  <button onclick="setThermalQ(600)" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">C<br>Panas Air</button>
+                  <button onclick="setThermalQ(2000)" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">D<br>Mendidih</button>
+                  <button onclick="setThermalQ(3090)" class="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">E<br>Stim</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ALL WORKED EXAMPLES & EXERCISES (SLIDES CH 11) -->
+          <div class="rounded-2xl bg-slate-800/60 border border-slate-700 p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
+              <i data-lucide="book-open-check" class="w-5 h-5 text-amber-400"></i>
+              Semua Contoh Soalan &amp; Latihan (Slide Kuliah UiTM Bab 11)
+            </h3>
+
+            <!-- Example 11.1 Working Off Breakfast -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch11-slide-7')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">EXAMPLE 11.1 • SLIDE 7</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Membakar Kalori Sarapan (Working Off Breakfast)</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Pelajar makan sarapan mengandungi $3.20 \times 10^2\text{ Cal}$. Dia mengangkat barbell $25.0\text{ kg}$ setinggi $0.400\text{ m}$. Berapa kali ($n$) dia perlu angkat untuk bakar tenaga tersebut?
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch11-slide-7" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch11-slide-7" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p>Tenaga $E = (3.20 \times 10^2\text{ Cal}) \times 4186\text{ J/Cal} = 1.34 \times 10^6\text{ J}$.</p>
+                <p>Kerja satu ulangan (naik + turun) $= 2mgh = 2(25.0)(9.80)(0.400) = 196\text{ J}$.</p>
+                <p>$$n = \frac{E}{2mgh} = \frac{1.34 \times 10^6}{196} = \mathbf{6.84 \times 10^3\text{ kali}}$$</p>
+              </div>
+            </div>
+
+            <!-- Example 16-4 Stair Master Milkshake -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch11-slide-8')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">EXAMPLE 16-4 • SLIDE 8</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Menaiki Tangga untuk Bakar Milkshake</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Individu berjisim $74.0\text{ kg}$ minum milkshake $305\text{ Cal}$. Berapa banyak anak tangga bertinggi $20.0\text{ cm}$ perlu dinaiki?
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch11-slide-8" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch11-slide-8" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p>$Q = 305,000\text{ cal} \times 4.186\text{ J/cal} = 1.28 \times 10^6\text{ J}$.</p>
+                <p>Tinggi keseluruhan $H = \frac{Q}{mg} = \frac{1.28 \times 10^6}{(74.0)(9.81)} = 1760\text{ m}$.</p>
+                <p>Bilangan anak tangga $= \frac{1760\text{ m}}{0.200\text{ m}} = \mathbf{8800\text{ anak tangga}}$.</p>
+              </div>
+            </div>
+
+            <!-- Example 11.2 Stressing a Strut -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch11-slide-13')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">EXAMPLE 11.2 • SLIDE 13 &amp; 14</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Pengembangan Terma &amp; Tegasan Strut Keluli</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Strut keluli ($L_0 = 2.00\text{ m}, m = 1.57\text{ kg}, A = 1.00 \times 10^{-4}\text{ m}^2$) menyerap haba $2.50 \times 10^5\text{ J}$ ($c = 448\text{ J/kg}\cdot^\circ\text{C}$). Cari: (a) kenaikan suhu $\Delta T$, (b) pertambahan panjang $\Delta L$, (c) tegasan mampatan jika tidak dibenarkan mengembang.
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch11-slide-13" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch11-slide-13" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>(a)</strong> $\Delta T = \frac{Q}{mc} = \frac{2.50 \times 10^5\text{ J}}{(1.57\text{ kg})(448\text{ J/kg}\cdot^\circ\text{C})} = \mathbf{355^\circ\text{C}}$</p>
+                <p><strong>(b)</strong> $\Delta L = \alpha L_0 \Delta T = (11 \times 10^{-6}\text{ }^\circ\text{C}^{-1})(2.00\text{ m})(355^\circ\text{C}) = \mathbf{7.8 \times 10^{-3}\text{ m}}$</p>
+                <p><strong>(c)</strong> $\text{Tegasan } \frac{F}{A} = Y \frac{\Delta L}{L} = (2.00 \times 10^{11}\text{ Pa})\frac{7.8 \times 10^{-3}\text{ m}}{2.01\text{ m}} = \mathbf{7.8 \times 10^8\text{ Pa}}$</p>
+              </div>
+            </div>
+
+            <!-- Example 11.3 & 11.4 Calorimeter unknown & 3 materials -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch11-slide-19')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">EXAMPLE 11.3 &amp; 11.4 • SLIDE 19 &amp; 21</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Kalorimetri: Menentukan $c$ Bahan &amp; Campuran 3 Bahan</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    (11.3) Blok $125\text{ g}$ pada $90.0^\circ\text{C}$ dimasukkan ke dalam $0.326\text{ kg}$ air pada $20.0^\circ\text{C}$, mencapai suhu $22.4^\circ\text{C}$.<br>
+                    (11.4) $0.400\text{ kg}$ air ($40.0^\circ\text{C}$) + bikar kaca $0.300\text{ kg}$ ($25.0^\circ\text{C}$) + aluminium $0.500\text{ kg}$ ($37.0^\circ\text{C}$).
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch11-slide-19" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch11-slide-19" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>(11.3)</strong> $c_x = \frac{(0.326)(4190)(22.4 - 20.0)}{(0.125)(90.0 - 22.4)} = \mathbf{390\text{ J/kg}\cdot^\circ\text{C}}$</p>
+                <p><strong>(11.4)</strong> $m_w c_w (T - 40) + m_{al} c_{al} (T - 37) + m_g c_g (T - 25) = 0 \implies \mathbf{T = 37.9^\circ\text{C}}$</p>
+              </div>
+            </div>
+
+            <!-- Slide 45, 46, 47 Exercises -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch11-slide-45')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">EXERCISE • SLIDE 45, 46, 47</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Latihan Lengkap Kalorimetri &amp; Konduksi</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Air terjun Angel Falls, kiub aluminium menyejuk dalam air, kalorimeter bekas Al, tingkap kaca, dan kotak styrofoam.
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch11-slide-45" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch11-slide-45" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>1. Angel Falls ($h = 807\text{ m}$):</strong> $\Delta T = \frac{gh}{c} = 1.89^\circ\text{C} \implies T_f = 15 + 1.89 = \mathbf{16.9^\circ\text{C}}$</p>
+                <p><strong>2. Kiub Aluminium dalam Air:</strong> $m_w = \frac{(1.85)(900)(85)}{(4186)(40)} = \mathbf{0.845\text{ kg}}$</p>
+                <p><strong>3. Kalorimeter Bekas Aluminium:</strong> $c_x = \mathbf{1.18 \times 10^3\text{ J/kg}\cdot^\circ\text{C}}$</p>
+                <p><strong>4. Tingkap Kaca:</strong> (a) $P = \mathbf{6 \times 10^3\text{ W}}$, (b) Tenaga 1 hari $= \mathbf{5 \times 10^8\text{ J}}$</p>
+                <p><strong>5. Kotak Styrofoam:</strong> $k = \mathbf{7.3 \times 10^{-2}\text{ W/m}\cdot^\circ\text{C}}$</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE QUIZ CHAPTER 11 (INSIDE TAB-CH11) -->
+          <div class="rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border border-amber-900/50 p-6 shadow-xl">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-700/80 pb-3">
+              <div>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                  <i data-lucide="award" class="w-5 h-5 text-amber-400"></i>
+                  Ujian Kefahaman Amal: Bab 11
+                </h3>
+                <p class="text-xs text-slate-400">Jawab soalan konsep terma di bawah.</p>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-slate-800 text-xs text-amber-400 font-mono border border-slate-700">
+                2 Soalan Pantas
+              </span>
+            </div>
+
+            <div class="space-y-6" id="quiz-ch11-container">
+              <div class="quiz-item p-4 rounded-xl bg-slate-900/70 border border-slate-800" data-qid="ch11_q1">
+                <p class="text-sm font-semibold text-slate-200">
+                  1. Dua cecair berjisim sama dipanaskan pada dapur yang sama untuk masa yang sama. Cecair A mencatat kenaikan suhu yang lebih rendah berbanding Cecair B. Cecair manakah mempunyai muatan haba tentu ($c$) lebih tinggi?
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-xs">
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch11_q1" value="A" class="accent-amber-500">
+                    <span>(A) Cecair A (cecair yang lebih sejuk / suhu naik sikit)</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch11_q1" value="B" class="accent-amber-500">
+                    <span>(B) Cecair B (cecair yang lebih panas)</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch11_q1" value="C" class="accent-amber-500">
+                    <span>(C) Kedua-duanya sama</span>
+                  </label>
+                </div>
+                <div class="quiz-feedback hidden mt-3 p-3 rounded-lg text-xs leading-relaxed"></div>
+              </div>
+
+              <div class="quiz-item p-4 rounded-xl bg-slate-900/70 border border-slate-800" data-qid="ch11_q2">
+                <p class="text-sm font-semibold text-slate-200">
+                  2. Berapakah jumlah tenaga haba yang diperlukan untuk menukar $40\text{ g}$ ais dari $-10^\circ\text{C}$ sehingga menjadi stim pada $110^\circ\text{C}$?
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-xs">
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch11_q2" value="A" class="accent-amber-500">
+                    <span>(A) $1.2 \times 10^5\text{ J}$</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch11_q2" value="B" class="accent-amber-500">
+                    <span>(B) $3.5 \times 10^4\text{ J}$</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch11_q2" value="C" class="accent-amber-500">
+                    <span>(C) $4.8 \times 10^6\text{ J}$</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch11_q2" value="D" class="accent-amber-500">
+                    <span>(D) $9.1 \times 10^3\text{ J}$</span>
+                  </label>
+                </div>
+                <div class="quiz-feedback hidden mt-3 p-3 rounded-lg text-xs leading-relaxed"></div>
+              </div>
+            </div>
+
+            <div class="mt-5 flex items-center justify-end gap-3">
+              <button onclick="checkQuiz('ch11')" class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs shadow-lg shadow-amber-500/25 flex items-center gap-1.5">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i> Semak Jawapan Bab 11
+              </button>
+            </div>
+          </div>
+        </div> <!-- END TAB-CH11 -->
+
+        <!-- ========================================================================= -->
+        <!-- TAB 4: CHAPTER 13 - VIBRATIONS AND WAVES -->
+        <!-- ========================================================================= -->
+        <div id="tab-ch13" class="chapter-tab space-y-8 hidden">
+          <!-- Header -->
+          <div class="rounded-2xl bg-gradient-to-r from-purple-950/60 via-violet-950/40 to-slate-900 p-6 border border-purple-800/50 relative overflow-hidden">
+            <div class="relative z-10">
+              <span class="px-3 py-1 rounded-md bg-purple-500/20 text-purple-300 text-xs font-semibold border border-purple-500/30">
+                CHAPTER 13
+              </span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">Vibrations and Waves (Getaran dan Gelombang)</h2>
+              <p class="text-slate-300 text-xs sm:text-sm mt-1">
+                Pensyarah: Hasnorhafiza binti Husni • UiTM Kampus Dengkil
+              </p>
+              <div class="flex flex-wrap gap-2 mt-3 text-[11px]">
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">13-1: Hooke's Law &amp; SHM</span>
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">13-2: Elastic Potential Energy</span>
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">13-3: SHM vs Circular Motion</span>
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">13-4: Equations of Motion (x, v, a)</span>
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">13-5: Simple Pendulum</span>
+                <span class="px-2 py-0.5 bg-slate-800/80 border border-slate-700 rounded text-slate-300">13-7 - 13-10: Waves &amp; Interference</span>
+              </div>
+            </div>
+            <div class="absolute right-4 -bottom-6 text-9xl text-purple-500/5 font-black select-none pointer-events-none">
+              CH 13
+            </div>
+          </div>
+
+          <!-- Section 13.1 & 13.2 Concept Breakdown -->
+          <div class="rounded-2xl bg-slate-800/70 border border-slate-700 p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700/80 pb-3">
+              <i data-lucide="activity" class="w-5 h-5 text-purple-400"></i>
+              13.1 &amp; 13.2: Hukum Hooke, Gerakan Harmonik Mudah (SHM), &amp; Tenaga Keupayaan
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                <h4 class="font-bold text-purple-300 text-sm">1. Hukum Hooke &amp; Daya Pemulih</h4>
+                <p class="text-slate-300">
+                  Daya spring $F_s$ sentiasa <strong>berkadar terus dengan sesaran $x$</strong> dan <strong>bertentangan arah</strong> ke kedudukan keseimbangan ($x = 0$):
+                </p>
+                <div class="p-2 bg-slate-950 rounded font-mono text-center text-purple-200">
+                  $$F_s = -kx, \quad a = -\frac{k}{m}x$$
+                </div>
+                <p class="text-slate-400 text-[11px]">
+                  ⚠️ <strong>PENTING:</strong> Pecutan $a$ tidak malar (bergantung kepada posisi $x$), jadi <strong>persamaan gerakan linear $v = u + at$ TIDAK BOLEH digunakan</strong>!
+                </p>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                <h4 class="font-bold text-pink-300 text-sm">2. Pemuliharaan Tenaga SHM</h4>
+                <p class="text-slate-300">
+                  Jumlah tenaga mekanikal sentiasa malar (jika tiada geseran):
+                </p>
+                <div class="p-2 bg-slate-950 rounded font-mono text-center text-pink-200">
+                  $$E = \frac{1}{2}mv^2 + \frac{1}{2}kx^2 = \frac{1}{2}kA^2$$
+                </div>
+                <p class="text-slate-400 text-[11px]">
+                  Halaju sebagai fungsi kedudukan:
+                  $$v = \pm\sqrt{\frac{k}{m}(A^2 - x^2)}$$
+                </p>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+                <h4 class="font-bold text-cyan-300 text-sm">3. Tempoh Ayunan ($T$)</h4>
+                <p class="text-slate-300">
+                  Perbandingan tempoh sistem Spring vs Bandul Ringkas:
+                </p>
+                <div class="p-2 bg-slate-950 rounded font-mono text-center text-cyan-200 space-y-1">
+                  <p>Spring: $$T = 2\pi\sqrt{\frac{m}{k}}$$</p>
+                  <p>Bandul: $$T = 2\pi\sqrt{\frac{L}{g}}$$</p>
+                </div>
+                <p class="text-slate-400 text-[11px]">
+                  Tempoh bandul <strong>TIDAK BERGANTUNG</strong> kepada jisim $m$ atau amplitud $A$!
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 13.4: SHM Equations of Motion -->
+          <div class="rounded-2xl bg-slate-800/70 border border-slate-700 p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700/80 pb-3">
+              <i data-lucide="line-chart" class="w-5 h-5 text-indigo-400"></i>
+              13.4: Persamaan Gerakan SHM sebagai Fungsi Masa
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-center font-mono">
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+                <span class="text-slate-400 block font-sans text-xs mb-1">Kedudukan ($x$)</span>
+                <p class="text-sky-300 text-sm font-bold">$$x(t) = A\cos(\omega t)$$</p>
+                <p class="text-[10px] text-slate-400 font-sans mt-2">Maksimum di $x = \pm A$, Sifar di $x = 0$</p>
+              </div>
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+                <span class="text-slate-400 block font-sans text-xs mb-1">Halaju ($v$)</span>
+                <p class="text-emerald-300 text-sm font-bold">$$v(t) = -\omega A\sin(\omega t)$$</p>
+                <p class="text-[10px] text-slate-400 font-sans mt-2">Maksimum $v_{\max} = \omega A$ di $x = 0$, Sifar di $x = \pm A$</p>
+              </div>
+              <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+                <span class="text-slate-400 block font-sans text-xs mb-1">Pecutan ($a$)</span>
+                <p class="text-rose-300 text-sm font-bold">$$a(t) = -\omega^2 A\cos(\omega t) = -\omega^2 x$$</p>
+                <p class="text-[10px] text-slate-400 font-sans mt-2">Maksimum $a_{\max} = \omega^2 A$ di $x = \pm A$, Sifar di $x = 0$</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE SHM & WAVE SIMULATOR -->
+          <div class="rounded-2xl bg-slate-800/80 border border-slate-700 p-6 shadow-xl">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-700/80 pb-4 mb-4">
+              <div>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                  <i data-lucide="activity" class="w-5 h-5 text-purple-400"></i>
+                  Makmal Maya Interaktif: Spring-Mass SHM &amp; Graf Sinusoidal Real-Time
+                </h3>
+                <p class="text-xs text-slate-400">Tengok hubungkait antara sesaran $x$, halaju $v$, dan pecutan $a$ secara animasi!</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="sim-ch13-playpause" class="px-3 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-600 text-white text-xs font-semibold flex items-center gap-1">
+                  <i data-lucide="pause" class="w-4 h-4"></i> Pause
+                </button>
+                <button id="sim-ch13-reset" class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-semibold">
+                  Reset
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+              <div class="lg:col-span-2 relative bg-slate-950 rounded-xl overflow-hidden border border-slate-800 aspect-video flex items-center justify-center">
+                <canvas id="canvas-shm" class="w-full h-full"></canvas>
+              </div>
+
+              <div class="space-y-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                <div>
+                  <div class="flex justify-between text-xs font-medium text-slate-300 mb-1">
+                    <span>Jisim Beban ($m$)</span>
+                    <span id="val-shm-m" class="text-purple-400 font-mono font-bold">0.50 kg</span>
+                  </div>
+                  <input id="slider-shm-m" type="range" min="0.1" max="2.0" step="0.05" value="0.50" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-400">
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-xs font-medium text-slate-300 mb-1">
+                    <span>Pemalar Spring ($k$)</span>
+                    <span id="val-shm-k" class="text-pink-400 font-mono font-bold">20.0 N/m</span>
+                  </div>
+                  <input id="slider-shm-k" type="range" min="5" max="100" step="5" value="20" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-pink-400">
+                </div>
+
+                <div>
+                  <div class="flex justify-between text-xs font-medium text-slate-300 mb-1">
+                    <span>Amplitud ($A$)</span>
+                    <span id="val-shm-a" class="text-cyan-400 font-mono font-bold">0.10 m</span>
+                  </div>
+                  <input id="slider-shm-a" type="range" min="0.05" max="0.20" step="0.01" value="0.10" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800 text-xs font-mono">
+                  <div class="p-2 bg-slate-800/80 rounded">
+                    <span class="text-[10px] text-slate-400 block font-sans">Tempoh ($T$)</span>
+                    <span id="calc-shm-t" class="text-emerald-400 font-bold">0.99 s</span>
+                  </div>
+                  <div class="p-2 bg-slate-800/80 rounded">
+                    <span class="text-[10px] text-slate-400 block font-sans">Halaju Sudut ($\omega$)</span>
+                    <span id="calc-shm-w" class="text-sky-400 font-bold">6.32 rad/s</span>
+                  </div>
+                  <div class="p-2 bg-slate-800/80 rounded">
+                    <span class="text-[10px] text-slate-400 block font-sans">Laju Maks ($v_{\max}$)</span>
+                    <span id="calc-shm-vmax" class="text-amber-400 font-bold">0.63 m/s</span>
+                  </div>
+                  <div class="p-2 bg-slate-800/80 rounded">
+                    <span class="text-[10px] text-slate-400 block font-sans">Pecutan Maks ($a_{\max}$)</span>
+                    <span id="calc-shm-amax" class="text-rose-400 font-bold">4.00 m/s²</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ALL WORKED EXAMPLES & EXERCISES (SLIDES CH 13) -->
+          <div class="rounded-2xl bg-slate-800/60 border border-slate-700 p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-700 pb-3">
+              <i data-lucide="book-open-check" class="w-5 h-5 text-amber-400"></i>
+              Semua Contoh Soalan &amp; Latihan (Slide Kuliah UiTM Bab 13)
+            </h3>
+
+            <!-- Example 13.1 Slide 12 -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch13-slide-12')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold">EXAMPLE 13.1 • SLIDE 12</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Daya dan Pecutan pada Pelbagai Posisi SHM</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Beban $0.350\text{ kg}$ disambung pada spring $k = 1.30 \times 10^2\text{ N/m}$ dilepaskan pada $x = 0.100\text{ m}$. Cari daya dan pecutan pada $x = 0.100, 0.050, 0, -0.050, -0.100\text{ m}$.
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch13-slide-12" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch13-slide-12" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p>• $x = 0.100\text{ m} \implies F = -13.0\text{ N}, a = \mathbf{-37.1\text{ m/s}^2}$</p>
+                <p>• $x = 0.050\text{ m} \implies F = -6.50\text{ N}, a = \mathbf{-18.6\text{ m/s}^2}$</p>
+                <p>• $x = 0\text{ m} \implies F = 0\text{ N}, a = \mathbf{0\text{ m/s}^2}$</p>
+                <p>• $x = -0.050\text{ m} \implies F = +6.50\text{ N}, a = \mathbf{+18.6\text{ m/s}^2}$</p>
+                <p>• $x = -0.100\text{ m} \implies F = +13.0\text{ N}, a = \mathbf{+37.1\text{ m/s}^2}$</p>
+              </div>
+            </div>
+
+            <!-- Slide 13 Example: Vertical Spring & Parallel Springs -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch13-slide-13')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold">EXAMPLE • SLIDE 13</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Spring Menegak &amp; Dua Spring Selari</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Beban $0.55\text{ kg}$ digantung meregangkan spring sebanyak $d = 2.0\text{ cm}$. (a) Cari pemalar spring $k$. (b) Jika 2 spring serupa dipasang secara selari, di manakah titik keseimbangan baru $d_2$? (c) Apakah pemalar berkesan $k_{eff}$?
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch13-slide-13" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch13-slide-13" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>(a)</strong> $k = \frac{mg}{d} = \mathbf{2.7 \times 10^2\text{ N/m}}$</p>
+                <p><strong>(b)</strong> $d_2 = \frac{mg}{2k} = \mathbf{1.0 \times 10^{-2}\text{ m} = 1.0\text{ cm}}$</p>
+                <p><strong>(c)</strong> $k_{eff} = \mathbf{5.4 \times 10^2\text{ N/m}} = 2k$</p>
+              </div>
+            </div>
+
+            <!-- Slide 21 Example: Car rolling down into spring -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch13-slide-21')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold">EXAMPLE • SLIDE 21</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Kereta Menuruni Bukit Menghentam Penampan Spring</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Kereta berberat $13,000\text{ N}$ menggelongsor dari bukit $h = 10.0\text{ m}$ dan melanggar spring ($k = 1.0 \times 10^6\text{ N/m}$). (a) Cari mampatan maksimum $x$. (b) Kira pecutan maksimum $a$. (c) Jika mampatan hanya $0.30\text{ m}$, cari kehilangan tenaga akibat geseran.
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch13-slide-21" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch13-slide-21" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>(a)</strong> $x = \sqrt{\frac{2mgh}{k}} = \mathbf{0.51\text{ m}}$</p>
+                <p><strong>(b)</strong> $a = -\frac{kx}{m} = \mathbf{-380\text{ m/s}^2}$</p>
+                <p><strong>(c)</strong> $W_{nc} = \frac{1}{2}kx^2 - mgh = \mathbf{-8.5 \times 10^4\text{ J}}$</p>
+              </div>
+            </div>
+
+            <!-- Example 13-3 Slide 42 Turbulence -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch13-slide-42')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold">EXAMPLE 13-3 • SLIDE 42</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Turbulens Kapal Terbang Boeing 747</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Kapal terbang mengalami turbulens naik-turun dengan amplitud $A = 30.0\text{ m}$ dan pecutan maksimum $a_{\max} = 1.8g$. Cari: (a) tempoh ayunan $T$, (b) laju menegak maksimum $v_{\max}$.
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch13-slide-42" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch13-slide-42" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>(a)</strong> $T = \mathbf{8.2\text{ s}}$</p>
+                <p><strong>(b)</strong> $v_{\max} = \mathbf{23\text{ m/s}}$</p>
+              </div>
+            </div>
+
+            <!-- Example 13.7 & 13-7 Pendulum slides 48 & 49 -->
+            <div class="example-card border border-slate-700/80 rounded-xl bg-slate-900/70 p-4">
+              <div class="flex items-start justify-between cursor-pointer" onclick="toggleExample('ex-ch13-slide-48')">
+                <div>
+                  <span class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[10px] font-bold">EXAMPLE 13.7 &amp; 13-7 • SLIDE 48 &amp; 49</span>
+                  <h4 class="font-semibold text-white text-sm mt-1">Mengukur Graviti $g$ &amp; Tali Bandul Dipotong</h4>
+                  <p class="text-xs text-slate-400 mt-1">
+                    (13.7) Bandul $L = 0.171\text{ m}$ berayun 72 kali dalam masa $60.0\text{ s}$. Kira nilai $g$.<br>
+                    (13-7) Bandul $L = 0.627\text{ m}, T = 1.59\text{ s}$. Tali dipotong di titik menegak, beban jatuh setinggi $y = 1.00\text{ m}$. Berapa masa beban sampai ke lantai?
+                  </p>
+                </div>
+                <button class="p-1 rounded bg-slate-800 text-slate-300 text-xs">
+                  <i data-lucide="chevron-down" id="icon-ex-ch13-slide-48" class="w-4 h-4 transition-transform"></i>
+                </button>
+              </div>
+              <div id="ex-ch13-slide-48" class="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-300 space-y-2 hidden">
+                <p><strong>(13.7)</strong> $g = \frac{4\pi^2(0.171)}{(0.833)^2} = \mathbf{9.73\text{ m/s}^2}$</p>
+                <p><strong>(13-7)</strong> $t_{jatuh} = \sqrt{\frac{2(1.00)}{9.79}} = \mathbf{0.452\text{ s}}$</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE QUIZ CHAPTER 13 (INSIDE TAB-CH13) -->
+          <div class="rounded-2xl bg-gradient-to-b from-slate-800 to-slate-900 border border-purple-900/50 p-6 shadow-xl">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-700/80 pb-3">
+              <div>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                  <i data-lucide="award" class="w-5 h-5 text-purple-400"></i>
+                  Ujian Kefahaman Amal: Bab 13
+                </h3>
+                <p class="text-xs text-slate-400">Uji kefahaman SHM dan gelombang anda.</p>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-slate-800 text-xs text-purple-400 font-mono border border-slate-700">
+                2 Soalan Pantas
+              </span>
+            </div>
+
+            <div class="space-y-6" id="quiz-ch13-container">
+              <div class="quiz-item p-4 rounded-xl bg-slate-900/70 border border-slate-800" data-qid="ch13_q1">
+                <p class="text-sm font-semibold text-slate-200">
+                  1. Jisim pada spring dalam SHM mempunyai amplitud $A$ dan tempoh $T$. Berapakah jumlah jarak yang dilalui oleh jisim tersebut selepas selang masa $1T$ (satu pusingan lengkap)?
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-xs">
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch13_q1" value="A" class="accent-purple-500">
+                    <span>(A) $0$</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch13_q1" value="B" class="accent-purple-500">
+                    <span>(B) $A$</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch13_q1" value="C" class="accent-purple-500">
+                    <span>(C) $2A$</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch13_q1" value="D" class="accent-purple-500">
+                    <span>(D) $4A$</span>
+                  </label>
+                </div>
+                <div class="quiz-feedback hidden mt-3 p-3 rounded-lg text-xs leading-relaxed"></div>
+              </div>
+
+              <div class="quiz-item p-4 rounded-xl bg-slate-900/70 border border-slate-800" data-qid="ch13_q2">
+                <p class="text-sm font-semibold text-slate-200">
+                  2. Apabila gelombang bunyi merambat dari udara masuk ke dalam air, sifat manakah yang BERUBAH dan KEKAL?
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 text-xs">
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch13_q2" value="A" class="accent-purple-500">
+                    <span>(A) Kelajuan ($v$) dan panjang gelombang ($\lambda$) berubah; frekuensi ($f$) kekal malar</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch13_q2" value="B" class="accent-purple-500">
+                    <span>(B) Frekuensi ($f$) berubah; kelajuan ($v$) kekal malar</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch13_q2" value="C" class="accent-purple-500">
+                    <span>(C) Semua sifat tidak berubah</span>
+                  </label>
+                  <label class="quiz-option flex items-center gap-2 p-2.5 rounded-lg border border-slate-700 hover:bg-slate-800 cursor-pointer">
+                    <input type="radio" name="ch13_q2" value="D" class="accent-purple-500">
+                    <span>(D) Hanya amplitud sahaja berubah</span>
+                  </label>
+                </div>
+                <div class="quiz-feedback hidden mt-3 p-3 rounded-lg text-xs leading-relaxed"></div>
+              </div>
+            </div>
+
+            <div class="mt-5 flex items-center justify-end gap-3">
+              <button onclick="checkQuiz('ch13')" class="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-bold text-xs shadow-lg shadow-purple-500/25 flex items-center gap-1.5">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i> Semak Jawapan Bab 13
+              </button>
+            </div>
+          </div>
+        </div> <!-- END TAB-CH13 -->
+
+        <!-- ========================================================================= -->
+        <!-- TAB 5: FORMULA POCKET CHEATSHEET -->
+        <!-- ========================================================================= -->
+        <div id="tab-cheatsheet" class="chapter-tab space-y-8 hidden">
+          <div class="rounded-2xl bg-gradient-to-r from-amber-950/60 via-yellow-950/40 to-slate-900 p-6 border border-amber-800/50">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="px-3 py-1 rounded-md bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-500/30">
+                  KAD FORMULA POKET UITM
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">Himpunan Formula Lengkap Fizik Asasi</h2>
+                <p class="text-slate-300 text-xs sm:text-sm mt-1">
+                  Semua formula penting untuk 4 Bab Peperiksaan. Boleh dicetak atau dibuka pada telefon pintar Amal!
+                </p>
+              </div>
+              <button onclick="window.print()" class="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow">
+                <i data-lucide="printer" class="w-4 h-4"></i> Cetak / Simpan PDF
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 print:grid-cols-2">
+            <!-- Ch 7 Card -->
+            <div class="p-5 rounded-xl bg-slate-800/80 border border-slate-700 space-y-3">
+              <h3 class="font-bold text-sky-400 text-base flex items-center gap-2 border-b border-slate-700 pb-2">
+                🪐 Bab 7: Rotational Motion
+              </h3>
+              <ul class="text-xs space-y-1.5 text-slate-300 font-mono">
+                <li>• $1\text{ rev} = 360^\circ = 2\pi\text{ rad}$</li>
+                <li>• $\omega_{av} = \frac{\Delta\theta}{\Delta t}, \quad \alpha_{av} = \frac{\Delta\omega}{\Delta t}$</li>
+                <li>• $\Delta s = r\Delta\theta, \quad v_t = r\omega, \quad a_t = r\alpha$</li>
+                <li>• $a_c = \frac{v^2}{r} = r\omega^2, \quad F_c = m\frac{v^2}{r} = mr\omega^2$</li>
+                <li>• $\omega = \omega_0 + \alpha t, \quad \theta = \theta_0 + \omega_0 t + \frac{1}{2}\alpha t^2, \quad \omega^2 = \omega_0^2 + 2\alpha\Delta\theta$</li>
+                <li>• Selekoh Rata: $\mu_s = \frac{v^2}{rg}$</li>
+                <li>• Selekoh Mencondong (Banked): $\tan\theta = \frac{v^2}{rg}$</li>
+                <li>• Gelung Menegak: $v_{top} = \sqrt{gR}, \quad v_{bot} = \sqrt{5gR}, \quad n_{bot} = 6mg$</li>
+              </ul>
+            </div>
+
+            <!-- Ch 9 Card -->
+            <div class="p-5 rounded-xl bg-slate-800/80 border border-slate-700 space-y-3">
+              <h3 class="font-bold text-teal-400 text-base flex items-center gap-2 border-b border-slate-700 pb-2">
+                🌊 Bab 9: Solids &amp; Fluids
+              </h3>
+              <ul class="text-xs space-y-1.5 text-slate-300 font-mono">
+                <li>• Ketumpatan: $\rho = \frac{m}{V}$ ($\text{kg/m}^3$)</li>
+                <li>• Daya Apungan: $F_B = \rho_{fluid} V_{displaced} g$</li>
+                <li>• Objek Terapung: $\frac{\rho_{obj}}{\rho_{fluid}} = \frac{V_{fluid}}{V_{obj}}$</li>
+                <li>• Berat Ketara: $W_{apparent} = W_{real} - F_B$</li>
+                <li>• Young Modulus: $\frac{F}{A} = Y \frac{\Delta L}{L_0}$</li>
+                <li>• Shear Modulus: $\frac{F}{A} = S \frac{\Delta x}{h}$</li>
+                <li>• Bulk Modulus: $\Delta P = -B \frac{\Delta V}{V_0}$</li>
+              </ul>
+            </div>
+
+            <!-- Ch 11 Card -->
+            <div class="p-5 rounded-xl bg-slate-800/80 border border-slate-700 space-y-3">
+              <h3 class="font-bold text-amber-400 text-base flex items-center gap-2 border-b border-slate-700 pb-2">
+                🔥 Bab 11: Thermal Processes
+              </h3>
+              <ul class="text-xs space-y-1.5 text-slate-300 font-mono">
+                <li>• $1\text{ cal} = 4.186\text{ J}$</li>
+                <li>• Muatan Haba Tentu: $Q = mc\Delta T$ ($\Delta T = T_f - T_i$)</li>
+                <li>• Haba Pendam: $Q = \pm mL_f$ (Pelakuran), $Q = \pm mL_v$ (Pengewapan)</li>
+                <li>• Keseimbangan Kalorimetri: $\sum Q = 0 \iff Q_{cold} = -Q_{hot}$</li>
+                <li>• Kadar Konduksi: $P = \frac{Q}{\Delta t} = kA \frac{T_h - T_c}{L}$</li>
+              </ul>
+            </div>
+
+            <!-- Ch 13 Card -->
+            <div class="p-5 rounded-xl bg-slate-800/80 border border-slate-700 space-y-3">
+              <h3 class="font-bold text-purple-400 text-base flex items-center gap-2 border-b border-slate-700 pb-2">
+                〰️ Bab 13: Vibrations &amp; Waves
+              </h3>
+              <ul class="text-xs space-y-1.5 text-slate-300 font-mono">
+                <li>• Hukum Hooke: $F_s = -kx, \quad PE_s = \frac{1}{2}kx^2$</li>
+                <li>• $\omega = 2\pi f = \frac{2\pi}{T} = \sqrt{\frac{k}{m}}$</li>
+                <li>• Tempoh Spring: $T = 2\pi\sqrt{\frac{m}{k}}$</li>
+                <li>• Tempoh Bandul: $T = 2\pi\sqrt{\frac{L}{g}}$</li>
+                <li>• SHM: $x = A\cos(\omega t), \quad v = -\omega A\sin(\omega t), \quad a = -\omega^2 A\cos(\omega t)$</li>
+                <li>• Hubungan Tenaga: $v = \pm\sqrt{\frac{k}{m}(A^2 - x^2)}$</li>
+                <li>• Laju Gelombang: $v = f\lambda$</li>
+                <li>• Gelombang pada Tali: $v = \sqrt{\frac{F}{\mu}}, \quad \mu = \frac{m}{L}$</li>
+              </ul>
+            </div>
+          </div>
+        </div> <!-- END TAB-CHEATSHEET -->
+
+      </main>
+
+      <!-- FOOTER -->
+      <footer class="mt-auto border-t border-slate-800 bg-slate-950/60 py-6 text-center text-xs text-slate-400 pb-20 md:pb-6">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p>Dicipta khas untuk <strong>Amal (Asasi Sains UiTM Dengkil)</strong> — Semoga Cemerlang Fizik A+! 🎓</p>
+          <div class="flex items-center gap-4 text-slate-400">
+            <span>Sem 1 / Asasi Physics</span>
+            <span>•</span>
+            <span>100% Mengikut Slide Pensyarah</span>
+          </div>
+        </div>
+      </footer>
+
+      <!-- MOBILE BOTTOM FLOATING DOCK -->
+      <div id="mobile-bottom-dock" class="md:hidden fixed bottom-3 left-1/2 -translate-x-1/2 z-40 bg-slate-900/90 backdrop-blur-lg border border-slate-700/80 rounded-2xl px-2 py-1.5 shadow-2xl flex items-center gap-1">
+        <button onclick="switchTab('ch7')" class="dock-btn flex flex-col items-center py-1 px-2.5 rounded-xl text-[10px] text-slate-400 hover:text-white transition" data-tab="ch7">
+          <span class="text-base">🪐</span>
+          <span>Bab 7</span>
+        </button>
+        <button onclick="switchTab('ch9')" class="dock-btn flex flex-col items-center py-1 px-2.5 rounded-xl text-[10px] text-slate-400 hover:text-white transition" data-tab="ch9">
+          <span class="text-base">🌊</span>
+          <span>Bab 9</span>
+        </button>
+        <button onclick="switchTab('ch11')" class="dock-btn flex flex-col items-center py-1 px-2.5 rounded-xl text-[10px] text-slate-400 hover:text-white transition" data-tab="ch11">
+          <span class="text-base">🔥</span>
+          <span>Bab 11</span>
+        </button>
+        <button onclick="switchTab('ch13')" class="dock-btn flex flex-col items-center py-1 px-2.5 rounded-xl text-[10px] text-slate-400 hover:text-white transition" data-tab="ch13">
+          <span class="text-base">〰️</span>
+          <span>Bab 13</span>
+        </button>
+        <button onclick="switchTab('cheatsheet')" class="dock-btn flex flex-col items-center py-1 px-2.5 rounded-xl text-[10px] text-amber-400 hover:text-amber-300 transition" data-tab="cheatsheet">
+          <span class="text-base">📑</span>
+          <span>Rumus</span>
+        </button>
+      </div>
+
+      <!-- Simulated Device Home Bar -->
+      <div id="device-home-bar" class="device-home-bar hidden"></div>
+
+    </div> <!-- End #app-viewport -->
+  </div> <!-- End #device-wrapper -->
+
+  <!-- QUICK CALCULATOR MODAL -->
+  <div id="calculator-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-white text-base flex items-center gap-2">
+          <i data-lucide="calculator" class="w-5 h-5 text-sky-400"></i>
+          Kalkulator Pantas Fizik Asasi
+        </h3>
+        <button onclick="closeFormulaModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs text-slate-300 font-medium mb-1">Pilih Formula Pengiraan:</label>
+          <select id="calc-tool-select" onchange="updateCalcTool()" class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg p-2.5 focus:border-sky-500">
+            <option value="shm_period">Tempoh Spring SHM (T = 2π√(m/k))</option>
+            <option value="pendulum_period">Tempoh Bandul (T = 2π√(L/g))</option>
+            <option value="centripetal">Daya Memusat (Fc = mv²/r)</option>
+            <option value="heat_mc">Haba Terma (Q = mcΔT)</option>
+            <option value="string_wave">Laju Gelombang Tali (v = √(F/μ))</option>
+            <option value="young_modulus">Pemanjangan Rod (ΔL = FL₀ / YA)</option>
+          </select>
+        </div>
+
+        <div id="calc-dynamic-inputs" class="space-y-2 text-xs">
+          <!-- Dynamically filled via JS -->
+        </div>
+
+        <button onclick="executeCalc()" class="w-full py-2.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-lg shadow-sky-500/25">
+          Kira Sekarang ⚡
+        </button>
+
+        <div id="calc-result-box" class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-center hidden">
+          <span class="text-[11px] text-slate-400 block">Hasil Pengiraan:</span>
+          <span id="calc-result-val" class="font-mono text-base font-bold text-emerald-400"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
